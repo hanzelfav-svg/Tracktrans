@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Tracktrans</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Trebuchet MS", Arial, sans-serif;
+            background: #f1f5f9;
+            color: #172033;
+        }
+
+        header {
+            background: linear-gradient(135deg, #172554, #1e3a8a);
+            color: white;
+            padding: 32px 24px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        header p {
+            margin: 8px 0 0;
+            color: #cbd5e1;
+        }
+
+        main {
+            max-width: 960px;
+            margin: 32px auto;
+            padding: 0 20px;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 24px;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+        }
+
+        .card h2 {
+            margin: 0 0 12px;
+            font-size: 16px;
+            color: #64748b;
+        }
+
+        .amount {
+            margin: 0;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .income {
+            color: #16a34a;
+        }
+
+        .expense {
+            color: #dc2626;
+        }
+
+        .balance {
+            color: #2563eb;
+        }
+
+        .add-button {
+            width: 100%;
+            margin-top: 20px;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            background: #172554;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        .add-button:hover {
+            background: #1e3a8a;
+            transform: translateY(-1px);
+        }
+
+        .transactions {
+            margin-top: 32px;
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .section-heading h2 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .transaction-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .transaction-item,
+        .empty-state {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 17px 20px;
+        }
+
+        .transaction-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .transaction-description {
+            margin: 0 0 5px;
+            font-weight: bold;
+        }
+
+        .transaction-type {
+            margin: 0;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .transaction-value {
+            margin: 0;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .empty-state {
+            color: #64748b;
+            text-align: center;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 10;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.55);
+        }
+
+        .modal.is-open {
+            display: flex;
+        }
+
+        .modal-content {
+            width: min(100%, 460px);
+            background: white;
+            border-radius: 14px;
+            padding: 28px;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.2);
+        }
+
+        .modal-content h2 {
+            margin: 0 0 22px;
+        }
+
+        .form-group {
+            margin-bottom: 17px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 13px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: 2px solid #93c5fd;
+            border-color: #2563eb;
+        }
+
+        .error-message {
+            min-height: 20px;
+            margin: 5px 0 0;
+            color: #dc2626;
+            font-size: 13px;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 22px;
+        }
+
+        .form-actions button {
+            padding: 11px 17px;
+            border: 0;
+            border-radius: 8px;
+            font: inherit;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .cancel-button {
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        .submit-button {
+            background: #172554;
+            color: white;
+        }
+
+        @media (max-width: 700px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .transaction-item {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .form-actions {
+                flex-direction: column-reverse;
+            }
+
+            .form-actions button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Tracktrans</h1>
+        <p>Aplikasi pencatatan transaksi</p>
+    </header>
+
+    <main>
+
+        <div class="dashboard">
+
+            <div class="card">
+                <h2>Pemasukan</h2>
+                <p class="amount income" id="income-total">Rp 0</p>
+            </div>
+
+            <div class="card">
+                <h2>Pengeluaran</h2>
+                <p class="amount expense" id="expense-total">Rp 0</p>
+            </div>
+
+            <div class="card">
+                <h2>Saldo</h2>
+                <p class="amount balance" id="balance-total">Rp 0</p>
+            </div>
+
+        </div>
+
+        <button class="add-button" id="open-modal-button" type="button">
+            + Tambah Transaksi
+        </button>
+
+        <section class="transactions" aria-labelledby="transactions-title">
+            <div class="section-heading">
+                <h2 id="transactions-title">Transaksi Terakhir</h2>
+            </div>
+            <div class="transaction-list" id="transaction-list"></div>
+        </section>
+
+    </main>
+
+    <div class="modal" id="transaction-modal" aria-hidden="true">
+        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="form-title">
+            <h2 id="form-title">Tambah Transaksi</h2>
+            <form id="transaction-form" novalidate>
+                <div class="form-group">
+                    <label for="transaction-type">Jenis Transaksi</label>
+                    <select id="transaction-type" name="type">
+                        <option value="income">Pemasukan</option>
+                        <option value="expense">Pengeluaran</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="transaction-description">Keterangan</label>
+                    <input id="transaction-description" name="description" type="text" autocomplete="off">
+                    <p class="error-message" id="description-error" aria-live="polite"></p>
+                </div>
+                <div class="form-group">
+                    <label for="transaction-amount">Nominal</label>
+                    <input id="transaction-amount" name="amount" type="number" min="1" step="1" inputmode="numeric">
+                    <p class="error-message" id="amount-error" aria-live="polite"></p>
+                </div>
+                <div class="form-actions">
+                    <button class="cancel-button" id="cancel-button" type="button">Batal</button>
+                    <button class="submit-button" type="submit">Simpan Transaksi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = "tracktrans-transactions";
+        let transactions = loadTransactions();
+
+        const incomeTotal = document.getElementById("income-total");
+        const expenseTotal = document.getElementById("expense-total");
+        const balanceTotal = document.getElementById("balance-total");
+        const transactionList = document.getElementById("transaction-list");
+        const transactionModal = document.getElementById("transaction-modal");
+        const transactionForm = document.getElementById("transaction-form");
+        const descriptionInput = document.getElementById("transaction-description");
+        const amountInput = document.getElementById("transaction-amount");
+        const descriptionError = document.getElementById("description-error");
+        const amountError = document.getElementById("amount-error");
+
+        function loadTransactions() {
+            try {
+                const storedTransactions = JSON.parse(localStorage.getItem(STORAGE_KEY));
+                return Array.isArray(storedTransactions) ? storedTransactions : [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function formatRupiah(amount) {
+            return "Rp " + new Intl.NumberFormat("id-ID").format(amount);
+        }
+
+        function updateDashboard() {
+            const income = transactions
+                .filter((transaction) => transaction.type === "income")
+                .reduce((total, transaction) => total + transaction.amount, 0);
+            const expense = transactions
+                .filter((transaction) => transaction.type === "expense")
+                .reduce((total, transaction) => total + transaction.amount, 0);
+
+            incomeTotal.textContent = formatRupiah(income);
+            expenseTotal.textContent = formatRupiah(expense);
+            balanceTotal.textContent = formatRupiah(income - expense);
+        }
+
+        function renderTransactions() {
+            transactionList.textContent = "";
+
+            if (transactions.length === 0) {
+                const emptyState = document.createElement("p");
+                emptyState.className = "empty-state";
+                emptyState.textContent = "Belum ada transaksi.";
+                transactionList.appendChild(emptyState);
+                return;
+            }
+
+            transactions.forEach((transaction) => {
+                const item = document.createElement("article");
+                item.className = "transaction-item";
+
+                const details = document.createElement("div");
+                const description = document.createElement("p");
+                description.className = "transaction-description";
+                description.textContent = transaction.description;
+                const type = document.createElement("p");
+                type.className = "transaction-type";
+                type.textContent = transaction.type === "income" ? "Pemasukan" : "Pengeluaran";
+                details.append(description, type);
+
+                const value = document.createElement("p");
+                value.className = "transaction-value " + transaction.type;
+                value.textContent = (transaction.type === "income" ? "+ " : "- ") + formatRupiah(transaction.amount);
+
+                item.append(details, value);
+                transactionList.appendChild(item);
+            });
+        }
+
+        function openModal() {
+            transactionModal.classList.add("is-open");
+            transactionModal.setAttribute("aria-hidden", "false");
+            descriptionInput.focus();
+        }
+
+        function closeModal() {
+            transactionModal.classList.remove("is-open");
+            transactionModal.setAttribute("aria-hidden", "true");
+            transactionForm.reset();
+            descriptionError.textContent = "";
+            amountError.textContent = "";
+        }
+
+        function validateForm() {
+            const description = descriptionInput.value.trim();
+            const amount = Number(amountInput.value);
+            let isValid = true;
+
+            descriptionError.textContent = "";
+            amountError.textContent = "";
+
+            if (!description) {
+                descriptionError.textContent = "Keterangan wajib diisi.";
+                isValid = false;
+            }
+
+            if (!amountInput.value || !Number.isFinite(amount) || amount <= 0) {
+                amountError.textContent = "Nominal harus lebih dari 0.";
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        document.getElementById("open-modal-button").addEventListener("click", openModal);
+        document.getElementById("cancel-button").addEventListener("click", closeModal);
+
+        transactionModal.addEventListener("click", (event) => {
+            if (event.target === transactionModal) {
+                closeModal();
+            }
+        });
+
+        transactionForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            if (!validateForm()) {
+                return;
+            }
+
+            transactions.unshift({
+                type: document.getElementById("transaction-type").value,
+                description: descriptionInput.value.trim(),
+                amount: Number(amountInput.value)
+            });
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+            updateDashboard();
+            renderTransactions();
+            closeModal();
+        });
+
+        updateDashboard();
+        renderTransactions();
+    </script>
+
+</body>
+</html>
