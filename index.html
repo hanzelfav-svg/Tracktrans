@@ -6,6 +6,8 @@
 
     <title>Tracktrans</title>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         * {
             box-sizing: border-box;
@@ -42,7 +44,7 @@
 
         .dashboard {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 20px;
         }
 
@@ -97,6 +99,137 @@
             transform: translateY(-1px);
         }
 
+        .financial-summary {
+            margin-top: 32px;
+        }
+
+        .summary-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 14px;
+        }
+
+        .summary-header h2 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .summary-period {
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: white;
+            color: #172033;
+            font: inherit;
+        }
+
+        .summary-period:focus {
+            outline: 2px solid #93c5fd;
+            border-color: #2563eb;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .summary-card {
+            padding: 20px;
+        }
+
+        .summary-card h3 {
+            margin: 0 0 10px;
+            color: #64748b;
+            font-size: 15px;
+        }
+
+        .summary-card .amount {
+            font-size: 23px;
+        }
+
+        .summary-profit {
+            color: #16a34a;
+        }
+
+        .summary-loss {
+            color: #dc2626;
+        }
+
+        .reports {
+            margin-top: 32px;
+        }
+
+        .reports h2,
+        .charts h2 {
+            margin: 0 0 14px;
+            font-size: 22px;
+        }
+
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+        }
+
+        .report-item {
+            padding: 18px;
+        }
+
+        .report-item h3 {
+            margin: 0 0 8px;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .report-item p {
+            margin: 0;
+            font-size: 19px;
+            font-weight: bold;
+        }
+
+        .report-empty {
+            color: #64748b;
+        }
+
+        .charts {
+            margin-top: 32px;
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .chart-card {
+            min-width: 0;
+            padding: 20px;
+        }
+
+        .chart-card h3 {
+            margin: 0 0 14px;
+            font-size: 16px;
+        }
+
+        .chart-card canvas {
+            display: block;
+            width: 100%;
+            height: 260px;
+        }
+
+        .chart-empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 260px;
+            margin: 0;
+            color: #64748b;
+            text-align: center;
+        }
+
         .transactions {
             margin-top: 32px;
         }
@@ -111,6 +244,31 @@
         .section-heading h2 {
             margin: 0;
             font-size: 22px;
+        }
+
+        .transaction-filters {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .transaction-filters input,
+        .transaction-filters select {
+            width: 100%;
+            min-width: 0;
+            padding: 11px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: white;
+            color: #172033;
+            font: inherit;
+        }
+
+        .transaction-filters input:focus,
+        .transaction-filters select:focus {
+            outline: 2px solid #93c5fd;
+            border-color: #2563eb;
         }
 
         .transaction-list {
@@ -144,10 +302,41 @@
             font-size: 14px;
         }
 
+        .transaction-date {
+            margin: 3px 0 0;
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
         .transaction-value {
             margin: 0;
             font-weight: bold;
             white-space: nowrap;
+        }
+
+        .transaction-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .transaction-actions button {
+            padding: 7px 11px;
+            border: 0;
+            border-radius: 7px;
+            font: inherit;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .edit-button {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .delete-button {
+            background: #fee2e2;
+            color: #b91c1c;
         }
 
         .empty-state {
@@ -241,8 +430,226 @@
             color: white;
         }
 
+        .app-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .toolbar-group,
+        .toolbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-select,
+        .toolbar-button,
+        .auth-button {
+            padding: 9px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: white;
+            color: #172033;
+            font: inherit;
+            cursor: pointer;
+        }
+
+        .app-nav {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .app-nav button {
+            padding: 8px 11px;
+            border: 0;
+            border-radius: 7px;
+            background: transparent;
+            color: #64748b;
+            font: inherit;
+            cursor: pointer;
+        }
+
+        .app-nav button:hover,
+        .app-nav button.is-active {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .toolbar-button,
+        .auth-button.primary {
+            border-color: #172554;
+            background: #172554;
+            color: white;
+        }
+
+        .workspace-panel {
+            margin-top: 32px;
+        }
+
+        .workspace-panel h2 {
+            margin: 0 0 14px;
+            font-size: 22px;
+        }
+
+        .staff-grid,
+        .attendance-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .staff-row,
+        .attendance-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 16px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+        }
+
+        .staff-row p,
+        .attendance-row p {
+            margin: 0;
+        }
+
+        .staff-meta,
+        .attendance-meta {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .attendance-filters {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .attendance-filters select,
+        .attendance-filters input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: white;
+            font: inherit;
+        }
+
+        .attendance-photo-preview {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .attendance-photo-preview img,
+        .attendance-row img {
+            width: 58px;
+            height: 58px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid #cbd5e1;
+        }
+
+        .auth-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: #f1f5f9;
+        }
+
+        .auth-overlay[hidden] {
+            display: none;
+        }
+
+        .auth-card {
+            width: min(100%, 420px);
+            padding: 28px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            box-shadow: 0 15px 35px rgba(15, 23, 42, 0.1);
+        }
+
+        .auth-card h2 {
+            margin: 0 0 8px;
+        }
+
+        .auth-card p {
+            color: #64748b;
+        }
+
+        .auth-card form {
+            display: grid;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .auth-card input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font: inherit;
+        }
+
+        .owner-only[hidden] {
+            display: none;
+        }
+
+        .staff-only {
+            display: none;
+        }
+
+        .staff-only.is-visible {
+            display: block;
+        }
+
+        .auth-error {
+            min-height: 20px;
+            margin: 0;
+            color: #dc2626;
+            font-size: 13px;
+        }
+
         @media (max-width: 700px) {
             .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-header {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .summary-period {
+                width: 100%;
+            }
+
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .report-grid,
+            .chart-grid,
+            .attendance-filters {
+                grid-template-columns: 1fr;
+            }
+
+            .transaction-filters {
                 grid-template-columns: 1fr;
             }
 
@@ -252,12 +659,27 @@
                 gap: 8px;
             }
 
+            .transaction-actions {
+                width: 100%;
+            }
+
+            .transaction-actions button {
+                flex: 1;
+            }
+
             .form-actions {
                 flex-direction: column-reverse;
             }
 
             .form-actions button {
                 width: 100%;
+            }
+
+            .app-toolbar,
+            .staff-row,
+            .attendance-row {
+                align-items: stretch;
+                flex-direction: column;
             }
         }
     </style>
@@ -267,12 +689,46 @@
 
     <header>
         <h1>Tracktrans</h1>
-        <p>Aplikasi pencatatan transaksi</p>
+        <p id="active-business-label">Aplikasi pencatatan transaksi</p>
     </header>
 
     <main>
 
-        <div class="dashboard">
+        <div class="app-toolbar">
+            <div class="toolbar-group">
+                <label for="business-selector">Bisnis aktif</label>
+                <select class="toolbar-select" id="business-selector" aria-label="Bisnis aktif"></select>
+                <button class="toolbar-button" id="add-business-button" type="button">+ Bisnis</button>
+                <button class="toolbar-button" id="edit-business-button" type="button">Edit Bisnis</button>
+                <button class="toolbar-button" id="delete-business-button" type="button">Hapus Bisnis</button>
+                <button class="toolbar-button" id="invite-staff-button" type="button">Undang Staff</button>
+                <button class="toolbar-button" id="revoke-invitation-button" type="button">Cabut Undangan</button>
+            </div>
+            <div class="toolbar-actions">
+                <span id="user-name-label"></span>
+                <button class="toolbar-button" id="export-transactions-button" type="button">Export CSV</button>
+                <button class="toolbar-button" id="export-excel-button" type="button">Export Excel</button>
+                <button class="toolbar-button" id="export-pdf-button" type="button">Export PDF</button>
+                <button class="toolbar-button" id="backup-button" type="button">Backup Prototype</button>
+                <button class="toolbar-button" id="restore-button" type="button">Restore</button>
+                <input id="restore-input" type="file" accept="application/json" hidden>
+                <button class="toolbar-button" id="logout-button" type="button">Logout</button>
+            </div>
+        </div>
+
+        <nav class="app-nav" aria-label="Navigasi Tracktrans">
+            <button class="owner-nav" data-target="owner-dashboard" type="button">Dashboard</button>
+            <button class="owner-nav" data-target="owner-reports" type="button">Laporan</button>
+            <button class="owner-nav" data-target="owner-charts" type="button">Grafik</button>
+            <button class="owner-nav" data-target="owner-staff-panel" type="button">Kelola Staff</button>
+            <button data-target="attendance-panel" type="button">Absensi</button>
+            <button data-target="transaction-list" type="button">Transaksi</button>
+            <button class="owner-nav" data-target="approval-panel" type="button">Approval</button>
+            <button class="staff-nav" data-target="staff-dashboard" type="button">Dashboard Staff</button>
+            <button class="staff-nav" data-target="staff-requests-panel" type="button">Pengajuan Saya</button>
+        </nav>
+
+        <div class="dashboard owner-only" id="owner-dashboard">
 
             <div class="card">
                 <h2>Pemasukan</h2>
@@ -289,20 +745,201 @@
                 <p class="amount balance" id="balance-total">Rp 0</p>
             </div>
 
+            <div class="card">
+                <h2 id="profit-total-label">Laba/Rugi</h2>
+                <p class="amount summary-profit" id="profit-total">Rp 0</p>
+            </div>
+
         </div>
 
         <button class="add-button" id="open-modal-button" type="button">
             + Tambah Transaksi
         </button>
 
+        <section class="workspace-panel staff-only" id="staff-dashboard" aria-labelledby="staff-dashboard-title">
+            <h2 id="staff-dashboard-title">Dashboard Staff</h2>
+            <div class="summary-cards">
+                <div class="card summary-card">
+                    <h3>Transaksi Saya Hari Ini</h3>
+                    <p class="amount balance" id="staff-today-count">0</p>
+                </div>
+                <div class="card summary-card">
+                    <h3>Total Transaksi Saya</h3>
+                    <p class="amount balance" id="staff-total-count">0</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="workspace-panel staff-only" id="staff-requests-panel" aria-labelledby="staff-requests-title">
+            <h2 id="staff-requests-title">Status Pengajuan Edit</h2>
+            <div class="staff-grid" id="staff-request-list"></div>
+        </section>
+
+        <section class="financial-summary owner-only" id="owner-summary" aria-labelledby="summary-title">
+            <div class="summary-header">
+                <h2 id="summary-title">Ringkasan Keuangan</h2>
+                <select class="summary-period" id="summary-period" aria-label="Periode ringkasan keuangan">
+                    <option value="current-month">Bulan Ini</option>
+                    <option value="previous-month">Bulan Sebelumnya</option>
+                    <option value="three-months">3 Bulan Terakhir</option>
+                    <option value="current-year">Tahun Ini</option>
+                    <option value="all">Semua Transaksi</option>
+                </select>
+            </div>
+            <div class="summary-cards">
+                <div class="card summary-card">
+                    <h3>Pemasukan</h3>
+                    <p class="amount income" id="summary-income">Rp 0</p>
+                </div>
+                <div class="card summary-card">
+                    <h3>Pengeluaran</h3>
+                    <p class="amount expense" id="summary-expense">Rp 0</p>
+                </div>
+                <div class="card summary-card">
+                    <h3 id="summary-result-label">Laba Bersih</h3>
+                    <p class="amount summary-profit" id="summary-result">Rp 0</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="reports owner-only" id="owner-reports" aria-labelledby="reports-title">
+            <h2 id="reports-title">Laporan Keuangan</h2>
+            <div class="report-grid" id="report-grid">
+                <div class="card report-item">
+                    <h3>Total Pemasukan</h3>
+                    <p class="income" id="report-income">Rp 0</p>
+                </div>
+                <div class="card report-item">
+                    <h3>Total Pengeluaran</h3>
+                    <p class="expense" id="report-expense">Rp 0</p>
+                </div>
+                <div class="card report-item">
+                    <h3 id="report-result-label">Laba/Rugi</h3>
+                    <p class="summary-profit" id="report-result">Rp 0</p>
+                </div>
+                <div class="card report-item">
+                    <h3>Jumlah Transaksi</h3>
+                    <p id="report-count">0</p>
+                </div>
+                <div class="card report-item">
+                    <h3>Pemasukan Terbesar</h3>
+                    <p id="report-largest-income">Rp 0</p>
+                </div>
+                <div class="card report-item">
+                    <h3>Pengeluaran Terbesar</h3>
+                    <p id="report-largest-expense">Rp 0</p>
+                </div>
+            </div>
+            <p class="empty-state report-empty" id="report-empty" hidden>Belum ada data untuk periode ini.</p>
+        </section>
+
+        <section class="charts owner-only" id="owner-charts" aria-labelledby="charts-title">
+            <h2 id="charts-title">Grafik Keuangan</h2>
+            <div class="chart-grid">
+                <div class="card chart-card">
+                    <h3>Pemasukan vs Pengeluaran</h3>
+                    <canvas id="comparison-chart" aria-label="Grafik perbandingan pemasukan dan pengeluaran"></canvas>
+                    <p class="chart-empty" id="comparison-empty" hidden>Belum ada data untuk periode ini.</p>
+                </div>
+                <div class="card chart-card">
+                    <h3>Tren Pemasukan dan Pengeluaran</h3>
+                    <canvas id="trend-chart" aria-label="Grafik tren pemasukan dan pengeluaran"></canvas>
+                    <p class="chart-empty" id="trend-empty" hidden>Belum ada data untuk periode ini.</p>
+                </div>
+            </div>
+        </section>
+
         <section class="transactions" aria-labelledby="transactions-title">
             <div class="section-heading">
                 <h2 id="transactions-title">Transaksi Terakhir</h2>
             </div>
+            <div class="transaction-filters">
+                <input id="search-input" type="search" placeholder="Cari keterangan" aria-label="Cari transaksi">
+                <select id="type-filter" aria-label="Filter jenis transaksi">
+                    <option value="all">Semua</option>
+                    <option value="income">Pemasukan</option>
+                    <option value="expense">Pengeluaran</option>
+                </select>
+                <select id="period-filter" aria-label="Filter periode">
+                    <option value="all">Semua</option>
+                    <option value="today">Hari Ini</option>
+                    <option value="month">Bulan Ini</option>
+                </select>
+            </div>
             <div class="transaction-list" id="transaction-list"></div>
         </section>
 
+        <section class="workspace-panel owner-only" id="owner-staff-panel" aria-labelledby="staff-title">
+            <h2 id="staff-title">Staff</h2>
+            <div class="card">
+                <form id="staff-form" class="form-actions" novalidate>
+                    <input id="staff-name" type="text" placeholder="Nama staff" aria-label="Nama staff">
+                    <input id="staff-role" type="text" placeholder="Jabatan" aria-label="Jabatan">
+                    <button class="submit-button" type="submit">+ Staff</button>
+                </form>
+                <p class="error-message" id="staff-error" aria-live="polite"></p>
+            </div>
+            <div class="staff-grid" id="staff-list"></div>
+            <div class="card" id="staff-detail" hidden></div>
+        </section>
+
+        <section class="workspace-panel owner-only" id="approval-panel" aria-labelledby="approval-title">
+            <h2 id="approval-title">Approval Edit Transaksi</h2>
+            <div class="staff-grid" id="approval-list"></div>
+        </section>
+
+        <section class="workspace-panel" id="attendance-panel" aria-labelledby="attendance-title">
+            <h2 id="attendance-title">Absensi</h2>
+            <div class="card">
+                <form id="attendance-form" class="form-actions" novalidate>
+                    <select id="attendance-staff" aria-label="Staff absensi"></select>
+                    <input id="attendance-photo" type="file" accept="image/*" capture="user" aria-label="Foto check-in">
+                    <button class="submit-button" type="submit">Check In</button>
+                </form>
+                <div class="attendance-photo-preview" id="check-in-preview"></div>
+                <input id="attendance-checkout-photo" type="file" accept="image/*" capture="user" aria-label="Foto check-out" hidden>
+                <div class="attendance-photo-preview" id="check-out-preview"></div>
+                <p class="error-message" id="attendance-error" aria-live="polite"></p>
+            </div>
+            <div class="attendance-filters">
+                <select id="attendance-filter-staff" aria-label="Filter staff absensi"></select>
+                <select id="attendance-filter-period" aria-label="Filter periode absensi">
+                    <option value="all">Semua Periode</option>
+                    <option value="today">Hari Ini</option>
+                    <option value="week">Minggu Ini</option>
+                    <option value="month">Bulan Ini</option>
+                    <option value="custom">Rentang Custom</option>
+                </select>
+                <input id="attendance-filter-from" type="date" aria-label="Tanggal mulai" hidden>
+                <input id="attendance-filter-to" type="date" aria-label="Tanggal akhir" hidden>
+                <select id="attendance-filter-status" aria-label="Filter status absensi">
+                    <option value="all">Semua Status</option>
+                    <option value="Hadir">Hadir</option>
+                    <option value="Terlambat">Terlambat</option>
+                    <option value="Izin">Izin</option>
+                    <option value="Tidak Hadir">Tidak Hadir</option>
+                </select>
+            </div>
+            <div class="attendance-list" id="attendance-list"></div>
+        </section>
+
     </main>
+
+    <div class="auth-overlay" id="auth-overlay" hidden>
+        <div class="auth-card">
+            <h2 id="auth-title">Masuk ke Tracktrans</h2>
+            <p id="auth-description">Gunakan akun lokal untuk memisahkan data pengguna.</p>
+            <form id="auth-form" novalidate>
+                <input id="auth-name" type="text" placeholder="Nama" autocomplete="name" hidden>
+                <input id="auth-email" type="email" placeholder="Email" autocomplete="email" required>
+                <input id="auth-password" type="password" placeholder="Password minimal 6 karakter" autocomplete="current-password" required>
+                <p class="auth-error" id="auth-error" aria-live="polite"></p>
+                <button class="auth-button primary" id="auth-submit" type="submit">Masuk</button>
+                <button class="auth-button" id="auth-mode-toggle" type="button">Belum punya akun? Daftar</button>
+                <button class="auth-button" id="forgot-password-button" type="button">Lupa password?</button>
+            </form>
+        </div>
+    </div>
 
     <div class="modal" id="transaction-modal" aria-hidden="true">
         <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="form-title">
@@ -322,7 +959,7 @@
                 </div>
                 <div class="form-group">
                     <label for="transaction-amount">Nominal</label>
-                    <input id="transaction-amount" name="amount" type="number" min="1" step="1" inputmode="numeric">
+                    <input id="transaction-amount" name="amount" type="text" inputmode="numeric" autocomplete="off" placeholder="Rp 0">
                     <p class="error-message" id="amount-error" aria-live="polite"></p>
                 </div>
                 <div class="form-actions">
@@ -335,25 +972,610 @@
 
     <script>
         const STORAGE_KEY = "tracktrans-transactions";
+        const supabaseConfig = window.TRACKTRANS_SUPABASE_CONFIG || {};
+        const supabaseClient = window.supabase && supabaseConfig.url && supabaseConfig.anonKey
+            ? window.supabase.createClient(supabaseConfig.url, supabaseConfig.anonKey)
+            : null;
+        const isSupabaseConfigured = Boolean(supabaseClient);
+        const USERS_KEY = "tracktrans-users";
+        const BUSINESSES_KEY = "tracktrans-businesses";
+        const STAFF_KEY = "tracktrans-staff";
+        const ATTENDANCE_KEY = "tracktrans-attendance";
+        const ATTENDANCE_PHOTO_KEY = "tracktrans-attendance-photo";
+        const SESSION_KEY = "tracktrans-session";
+        const MEMBERSHIPS_KEY = "tracktrans-memberships";
+        const INVITATIONS_KEY = "tracktrans-invitations";
+        const EDIT_REQUESTS_KEY = "tracktrans-edit-requests";
+        const AUDIT_KEY = "tracktrans-audit";
+        const LEGACY_BUSINESS_ID = "business-default";
+        let currentUser = null;
+        let currentBusinessId = LEGACY_BUSINESS_ID;
+        if (!isSupabaseConfigured) {
+            ensureDefaultWorkspace();
+        }
+        const savedSession = readStorage(SESSION_KEY, null);
+        if (!isSupabaseConfigured && savedSession) {
+            currentUser = readStorage(USERS_KEY, []).find((user) => user.id === savedSession.userId) || null;
+            if (currentUser && !currentUser.role) {
+                currentUser.role = "owner";
+            }
+            currentBusinessId = savedSession.businessId || LEGACY_BUSINESS_ID;
+            if (currentUser && !canAccessBusiness(currentBusinessId)) {
+                const firstBusiness = getUserBusinesses()[0];
+                currentBusinessId = firstBusiness ? firstBusiness.id : LEGACY_BUSINESS_ID;
+            }
+        }
         let transactions = loadTransactions();
+        let editingTransactionId = null;
+        let staff = [];
+        let attendance = [];
+        let remoteEditRequests = [];
+        let remoteBusinesses = [];
+        let remoteMemberships = [];
+        let pendingCheckoutAttendanceId = null;
 
         const incomeTotal = document.getElementById("income-total");
         const expenseTotal = document.getElementById("expense-total");
         const balanceTotal = document.getElementById("balance-total");
+        const profitTotalLabel = document.getElementById("profit-total-label");
+        const profitTotal = document.getElementById("profit-total");
         const transactionList = document.getElementById("transaction-list");
         const transactionModal = document.getElementById("transaction-modal");
         const transactionForm = document.getElementById("transaction-form");
+        const formTitle = document.getElementById("form-title");
+        const transactionTypeInput = document.getElementById("transaction-type");
         const descriptionInput = document.getElementById("transaction-description");
         const amountInput = document.getElementById("transaction-amount");
         const descriptionError = document.getElementById("description-error");
         const amountError = document.getElementById("amount-error");
+        const searchInput = document.getElementById("search-input");
+        const typeFilter = document.getElementById("type-filter");
+        const periodFilter = document.getElementById("period-filter");
+        const authOverlay = document.getElementById("auth-overlay");
+        const authForm = document.getElementById("auth-form");
+        const authTitle = document.getElementById("auth-title");
+        const authDescription = document.getElementById("auth-description");
+        const authName = document.getElementById("auth-name");
+        const authEmail = document.getElementById("auth-email");
+        const authPassword = document.getElementById("auth-password");
+        const authError = document.getElementById("auth-error");
+        const authSubmit = document.getElementById("auth-submit");
+        const authModeToggle = document.getElementById("auth-mode-toggle");
+        const forgotPasswordButton = document.getElementById("forgot-password-button");
+        const businessSelector = document.getElementById("business-selector");
+        const activeBusinessLabel = document.getElementById("active-business-label");
+        const userNameLabel = document.getElementById("user-name-label");
+        const staffForm = document.getElementById("staff-form");
+        const staffNameInput = document.getElementById("staff-name");
+        const staffRoleInput = document.getElementById("staff-role");
+        const staffError = document.getElementById("staff-error");
+        const staffList = document.getElementById("staff-list");
+        const staffDetail = document.getElementById("staff-detail");
+        const attendanceForm = document.getElementById("attendance-form");
+        const attendanceStaff = document.getElementById("attendance-staff");
+        const attendancePhoto = document.getElementById("attendance-photo");
+        const attendanceCheckoutPhoto = document.getElementById("attendance-checkout-photo");
+        const checkInPreview = document.getElementById("check-in-preview");
+        const checkOutPreview = document.getElementById("check-out-preview");
+        const attendanceError = document.getElementById("attendance-error");
+        const attendanceList = document.getElementById("attendance-list");
+        const attendanceFilterStaff = document.getElementById("attendance-filter-staff");
+        const attendanceFilterPeriod = document.getElementById("attendance-filter-period");
+        const attendanceFilterFrom = document.getElementById("attendance-filter-from");
+        const attendanceFilterTo = document.getElementById("attendance-filter-to");
+        const attendanceFilterStatus = document.getElementById("attendance-filter-status");
+        const staffDashboard = document.getElementById("staff-dashboard");
+        const staffTodayCount = document.getElementById("staff-today-count");
+        const staffTotalCount = document.getElementById("staff-total-count");
+        const approvalList = document.getElementById("approval-list");
+        const staffRequestList = document.getElementById("staff-request-list");
+
+        let authMode = "login";
+        if (new URLSearchParams(window.location.search).get("reset") === "1") {
+            authMode = "reset";
+            authTitle.textContent = "Atur password baru";
+            authDescription.textContent = "Masukkan password baru untuk akun Anda.";
+            authName.hidden = true;
+            authEmail.required = false;
+            authPassword.autocomplete = "new-password";
+            authSubmit.textContent = "Simpan password";
+            authModeToggle.hidden = true;
+            forgotPasswordButton.hidden = true;
+        }
+
+        function readStorage(key, fallback) {
+            try {
+                const value = JSON.parse(localStorage.getItem(key));
+                return value === null ? fallback : value;
+            } catch (error) {
+                return fallback;
+            }
+        }
+
+        function writeStorage(key, value) {
+            localStorage.setItem(key, JSON.stringify(value));
+        }
+
+        function saveAttendancePhoto(photoData) {
+            if (!photoData) {
+                return null;
+            }
+            const photoId = createId("attendance-photo");
+            writeStorage(`${businessScopedKey(ATTENDANCE_PHOTO_KEY)}-${photoId}`, { id: photoId, businessId: currentBusinessId, data: photoData, createdAt: new Date().toISOString() });
+            return photoId;
+        }
+
+        function getAttendancePhoto(photoId) {
+            if (!photoId) {
+                return null;
+            }
+            const photo = readStorage(`${businessScopedKey(ATTENDANCE_PHOTO_KEY)}-${photoId}`, null);
+            return photo ? photo.data : null;
+        }
+
+        function deleteAttendancePhoto(photoId) {
+            if (photoId) {
+                localStorage.removeItem(`${businessScopedKey(ATTENDANCE_PHOTO_KEY)}-${photoId}`);
+            }
+        }
+
+        function scopedKey(key) {
+            return `${key}-${currentUser ? currentUser.id : "guest"}-${currentBusinessId}`;
+        }
+
+        function businessScopedKey(key, businessId = currentBusinessId) {
+            return `${key}-${businessId}`;
+        }
+
+        function isOwner() {
+            return Boolean(currentUser && currentUser.role === "owner");
+        }
+
+        function getCurrentUser() {
+            return currentUser;
+        }
+
+        function getCurrentRole() {
+            return currentUser ? currentUser.role : null;
+        }
+
+        function getMembershipsForUser(userId = currentUser && currentUser.id) {
+            const memberships = supabaseClient && remoteMemberships.length ? remoteMemberships : readStorage(MEMBERSHIPS_KEY, []);
+            return memberships.filter((membership) => membership.userId === userId && membership.status === "active");
+        }
+
+        function canAccessBusiness(businessId) {
+            if (!currentUser || !businessId) {
+                return false;
+            }
+            const business = (supabaseClient && remoteBusinesses.length ? remoteBusinesses : readStorage(BUSINESSES_KEY, [])).find((item) => item.id === businessId);
+            return Boolean(business && (business.ownerId === currentUser.id || getMembershipsForUser().some((membership) => membership.businessId === businessId)));
+        }
+
+        function hasBusinessAccess(businessId) {
+            return canAccessBusiness(businessId);
+        }
+
+        function canManageStaff(businessId = currentBusinessId) {
+            return canManageBusiness(businessId);
+        }
+
+        function canApproveTransaction(businessId = currentBusinessId) {
+            return canManageBusiness(businessId);
+        }
+
+        function canViewAllTransactions(businessId = currentBusinessId) {
+            return canManageBusiness(businessId);
+        }
+
+        function canViewAttendance(record) {
+            return Boolean(record && record.businessId === currentBusinessId && (isOwner() || record.userId === currentUser.id) && canAccessBusiness(currentBusinessId));
+        }
+
+        function canManageBusiness(businessId = currentBusinessId) {
+            const businesses = supabaseClient && remoteBusinesses.length ? remoteBusinesses : readStorage(BUSINESSES_KEY, []);
+            const business = businesses.find((item) => item.id === businessId);
+            return isOwner() && Boolean(business && business.ownerId === currentUser.id);
+        }
+
+        function canViewTransaction(transaction) {
+            if (!transaction || transaction.businessId !== currentBusinessId || !canAccessBusiness(currentBusinessId)) {
+                return false;
+            }
+            return isOwner() || transaction.createdBy === currentUser.id;
+        }
+
+        function canEditTransaction(transaction) {
+            return isOwner() && canViewTransaction(transaction);
+        }
+
+        function canDeleteTransaction(transaction) {
+            return isOwner() && canViewTransaction(transaction);
+        }
+
+        function createEditRequest(transaction, newData) {
+            if (!currentUser || isOwner() || !canViewTransaction(transaction)) {
+                return false;
+            }
+            const reason = window.prompt("Alasan perubahan transaksi:");
+            if (!reason || !reason.trim()) {
+                return false;
+            }
+            const requests = getEditRequests().slice();
+            const request = { id: createId("edit-request"), transactionId: transaction.id, requestedBy: currentUser.id, businessId: currentBusinessId, oldData: transaction, newData, reason: reason.trim(), status: "pending", createdAt: new Date().toISOString(), reviewedBy: null, reviewedAt: null };
+            requests.push(request);
+            if (!supabaseClient) {
+                writeStorage(EDIT_REQUESTS_KEY, requests);
+            }
+            if (supabaseClient) {
+                void supabaseClient.from("transaction_edit_requests").insert({
+                    transaction_id: transaction.id,
+                    business_id: currentBusinessId,
+                    requested_by: currentUser.id,
+                    old_data: transaction,
+                    requested_data: newData,
+                    reason: reason.trim()
+                }).select("id").single().then(({ data, error }) => {
+                    if (error) console.error("Tracktrans edit request sync failed", error.message);
+                    if (data) {
+                        request.supabaseId = data.id;
+                        remoteEditRequests = [...remoteEditRequests, { ...request, id: data.id }];
+                    }
+                });
+            }
+            recordAudit("transaction_edit_requested", "transaction", transaction.id, transaction, newData);
+            renderStaffRequests();
+            window.alert("Permintaan edit dikirim ke Owner.");
+            return true;
+        }
+
+        function recordAudit(action, entityType, entityId, oldValue = null, newValue = null) {
+            if (!currentUser || !canAccessBusiness(currentBusinessId)) {
+                return;
+            }
+            const audit = readStorage(AUDIT_KEY, []);
+            const auditEntry = { id: createId("audit"), businessId: currentBusinessId, userId: currentUser.id, action, entityType, entityId, oldValue, newValue, timestamp: new Date().toISOString() };
+            audit.push(auditEntry);
+            if (!supabaseClient) {
+                writeStorage(AUDIT_KEY, audit);
+            }
+            if (supabaseClient) {
+                const databaseEntityId = typeof entityId === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(entityId) ? entityId : null;
+                void supabaseClient.from("audit_logs").insert({ business_id: currentBusinessId, user_id: currentUser.id, action, entity_type: entityType, entity_id: databaseEntityId, old_value: oldValue, new_value: newValue, metadata: {} }).then(({ error }) => {
+                    if (error) console.error("Tracktrans audit sync failed", error.message);
+                });
+            }
+        }
+
+        function createId(prefix) {
+            return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+        }
+
+        function createTransactionId() {
+            if (isSupabaseConfigured && window.crypto && window.crypto.randomUUID) {
+                return window.crypto.randomUUID();
+            }
+            return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+        }
+
+        async function hashPassword(password) {
+            if (!window.crypto || !window.crypto.subtle) {
+                let hash = 2166136261;
+                for (let index = 0; index < password.length; index += 1) {
+                    hash ^= password.charCodeAt(index);
+                    hash = Math.imul(hash, 16777619);
+                }
+                return `fallback-${(hash >>> 0).toString(16)}`;
+            }
+            const bytes = new TextEncoder().encode(password);
+            const digest = await window.crypto.subtle.digest("SHA-256", bytes);
+            return Array.from(new Uint8Array(digest)).map((byte) => byte.toString(16).padStart(2, "0")).join("");
+        }
+
+        async function initializeSupabaseAuth() {
+            if (!supabaseClient) {
+                return;
+            }
+            supabaseClient.auth.onAuthStateChange((event, session) => {
+                if (event === "SIGNED_OUT" || !session) {
+                    currentUser = null;
+                    authOverlay.hidden = false;
+                }
+            });
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) {
+                currentUser = null;
+                authOverlay.hidden = false;
+                return;
+            }
+            await hydrateSupabaseWorkspace(session.user);
+            await reloadAuthenticatedWorkspace();
+        }
+
+        async function hydrateSupabaseWorkspace(authUser) {
+            const { data: profile } = await supabaseClient.from("profiles").select("id, full_name, email").eq("id", authUser.id).maybeSingle();
+            const { data: accessibleBusinesses } = await supabaseClient.from("businesses").select("id, owner_id, name, description, created_at");
+            const ownedBusinesses = (accessibleBusinesses || []).filter((business) => business.owner_id === authUser.id);
+            const { data: memberships } = await supabaseClient.from("business_members").select("id, business_id, user_id, role, status, invited_by, joined_at").eq("user_id", authUser.id).eq("status", "active");
+            const businesses = (accessibleBusinesses || []).map((business) => ({ id: business.id, ownerId: business.owner_id, name: business.name, description: business.description, createdAt: business.created_at }));
+            remoteBusinesses = businesses;
+            const localMemberships = (memberships || []).map((membership) => ({ id: membership.id, businessId: membership.business_id, userId: membership.user_id, role: membership.role, status: membership.status, invitedBy: membership.invited_by, joinedAt: membership.joined_at }));
+            remoteMemberships = localMemberships;
+            currentUser = { id: authUser.id, name: profile ? profile.full_name : (authUser.user_metadata?.full_name || authUser.email), email: authUser.email, role: (ownedBusinesses || []).length > 0 ? "owner" : "staff", supabase: true };
+            const storedBusiness = readStorage(SESSION_KEY, null);
+            currentBusinessId = storedBusiness && canAccessBusiness(storedBusiness.businessId)
+                ? storedBusiness.businessId
+                : ((ownedBusinesses || [])[0]?.id || (memberships || [])[0]?.business_id || "");
+        }
+
+        async function reloadAuthenticatedWorkspace() {
+            transactions = await loadTransactionsFromSupabase();
+            await loadEditRequestsFromSupabase();
+            loadWorkspaceData();
+            if (supabaseClient) {
+                attendance = await loadAttendanceFromSupabase();
+            }
+            updateDashboard();
+            renderReportsAndCharts();
+            renderTransactions();
+            showAuthenticatedApp();
+        }
+
+        async function loadAttendanceFromSupabase() {
+            const { data, error } = await supabaseClient.from("attendance")
+                .select("id, business_id, user_id, date, check_in_at, check_in_photo, check_out_at, check_out_photo, status, created_at, updated_at")
+                .eq("business_id", currentBusinessId)
+                .order("date", { ascending: false });
+            if (error) {
+                console.error("Tracktrans attendance load failed", error.message);
+                return [];
+            }
+            return (data || []).map((record) => ({
+                id: record.id,
+                businessId: record.business_id,
+                userId: record.user_id,
+                date: record.date,
+                checkIn: record.check_in_at,
+                checkInPhoto: record.check_in_photo,
+                checkOut: record.check_out_at,
+                checkOutPhoto: record.check_out_photo,
+                status: record.status,
+                createdAt: record.created_at,
+                updatedAt: record.updated_at
+            }));
+        }
+
+        async function uploadSupabaseAttendancePhoto(photoData, suffix) {
+            if (!photoData) {
+                return null;
+            }
+            const response = await fetch(photoData);
+            const blob = await response.blob();
+            const date = getJakartaDateKey(new Date());
+            const path = `${currentBusinessId}/${currentUser.id}/${date}/${suffix}.jpg`;
+            const { error } = await supabaseClient.storage.from("attendance").upload(path, blob, { contentType: "image/jpeg", upsert: true });
+            if (error) {
+                throw error;
+            }
+            return path;
+        }
+
+        async function loadTransactionsFromSupabase() {
+            if (!supabaseClient || !currentUser || !currentBusinessId) {
+                return loadTransactions();
+            }
+            const { data, error } = await supabaseClient.from("transactions")
+                .select("id, business_id, created_by, type, description, amount, transaction_date, created_at, updated_at")
+                .eq("business_id", currentBusinessId)
+                .order("transaction_date", { ascending: false });
+            if (error) {
+                console.error("Tracktrans transactions load failed", error.message);
+                return [];
+            }
+            return (data || []).map((transaction) => ({
+                id: transaction.id,
+                businessId: transaction.business_id,
+                createdBy: transaction.created_by,
+                type: transaction.type,
+                description: transaction.description,
+                amount: Number(transaction.amount),
+                date: transaction.transaction_date || transaction.created_at
+            }));
+        }
+
+        async function loadEditRequestsFromSupabase() {
+            if (!supabaseClient || !currentUser || !currentBusinessId) {
+                return;
+            }
+            const { data, error } = await supabaseClient.from("transaction_edit_requests")
+                .select("id, transaction_id, business_id, requested_by, old_data, requested_data, reason, status, reviewed_by, reviewed_at, created_at")
+                .eq("business_id", currentBusinessId)
+                .order("created_at", { ascending: false });
+            if (error) {
+                console.error("Tracktrans edit requests load failed", error.message);
+                return;
+            }
+            remoteEditRequests = (data || []).map((request) => ({
+                id: request.id,
+                transactionId: request.transaction_id,
+                businessId: request.business_id,
+                requestedBy: request.requested_by,
+                oldData: request.old_data,
+                newData: request.requested_data,
+                reason: request.reason,
+                status: request.status,
+                reviewedBy: request.reviewed_by,
+                reviewedAt: request.reviewed_at,
+                createdAt: request.created_at
+            }));
+        }
+
+        function getEditRequests() {
+            return supabaseClient ? remoteEditRequests : readStorage(EDIT_REQUESTS_KEY, []);
+        }
+
+        async function syncTransactionToSupabase(transaction) {
+            if (!supabaseClient || !currentUser || !transaction) {
+                return;
+            }
+            const { error } = await supabaseClient.from("transactions").upsert({
+                id: transaction.id,
+                business_id: transaction.businessId,
+                created_by: transaction.createdBy,
+                type: transaction.type,
+                description: transaction.description,
+                amount: transaction.amount,
+                transaction_date: transaction.date
+            });
+            if (error) {
+                console.error("Tracktrans transaction sync failed", error.message);
+            }
+        }
+
+        async function deleteTransactionFromSupabase(transactionId) {
+            if (!supabaseClient || !transactionId) {
+                return;
+            }
+            const { error } = await supabaseClient.from("transactions").delete().eq("id", transactionId).eq("business_id", currentBusinessId);
+            if (error) {
+                console.error("Tracktrans transaction delete failed", error.message);
+            }
+        }
+
+        async function hashInvitationToken(token) {
+            const bytes = new TextEncoder().encode(token);
+            const digest = await crypto.subtle.digest("SHA-256", bytes);
+            return Array.from(new Uint8Array(digest)).map((byte) => byte.toString(16).padStart(2, "0")).join("");
+        }
+
+        async function createSupabaseInvitation() {
+            const rawToken = crypto.randomUUID ? `${crypto.randomUUID()}-${crypto.randomUUID()}` : createId("invite");
+            const tokenHash = await hashInvitationToken(rawToken);
+            const { data, error } = await supabaseClient.rpc("create_invitation", {
+                p_business_id: currentBusinessId,
+                p_token_hash: tokenHash,
+                p_invited_email: null,
+                p_expires_at: new Date(Date.now() + 7 * 86400000).toISOString()
+            });
+            if (error) {
+                throw error;
+            }
+            const link = `${window.location.origin}${window.location.pathname}?invite=${encodeURIComponent(rawToken)}`;
+            return { data, link };
+        }
+
+        async function acceptSupabaseInvitation(rawToken) {
+            const tokenHash = await hashInvitationToken(rawToken);
+            const { data, error } = await supabaseClient.rpc("accept_invitation", { p_token_hash: tokenHash });
+            if (error) {
+                throw error;
+            }
+            return data;
+        }
+
+        async function submitSupabaseAuth(email, password, registering) {
+            if (registering) {
+                const name = authName.value.trim();
+                if (!name) {
+                    authError.textContent = "Nama wajib diisi.";
+                    return;
+                }
+                const { error } = await supabaseClient.auth.signUp({ email, password, options: { data: { full_name: name } } });
+                if (error) {
+                    authError.textContent = error.message;
+                    return;
+                }
+                authError.textContent = "Registrasi berhasil. Periksa email untuk konfirmasi jika diminta Supabase.";
+                return;
+            }
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (error) {
+                authError.textContent = error.message;
+                return;
+            }
+            await hydrateSupabaseWorkspace(data.user);
+            await reloadAuthenticatedWorkspace();
+        }
+
+        function getUserBusinesses() {
+            if (!currentUser) {
+                return [];
+            }
+            const allBusinesses = supabaseClient && remoteBusinesses.length ? remoteBusinesses : readStorage(BUSINESSES_KEY, []);
+            const owned = allBusinesses.filter((business) => business.ownerId === currentUser.id);
+            const memberIds = getMembershipsForUser().map((membership) => membership.businessId);
+            const memberBusinesses = allBusinesses.filter((business) => memberIds.includes(business.id));
+            return [...owned, ...memberBusinesses.filter((business) => !owned.some((ownedBusiness) => ownedBusiness.id === business.id))];
+        }
+
+        function getActiveBusiness() {
+            return getUserBusinesses().find((business) => business.id === currentBusinessId);
+        }
+
+        function ensureDefaultWorkspace() {
+            const users = readStorage(USERS_KEY, []);
+            const businesses = readStorage(BUSINESSES_KEY, []);
+            const legacyTransactions = readStorage(STORAGE_KEY, null);
+            if (users.length === 0 && Array.isArray(legacyTransactions)) {
+                const user = { id: "user-local", name: "Pemilik", email: "local@tracktrans.app", passwordHash: "legacy", role: "owner", createdAt: new Date().toISOString() };
+                users.push(user);
+                businesses.push({ id: LEGACY_BUSINESS_ID, ownerId: user.id, name: "Bisnis Utama", description: "Migrasi Tracktrans", createdAt: new Date().toISOString() });
+                writeStorage(USERS_KEY, users);
+                writeStorage(BUSINESSES_KEY, businesses);
+                writeStorage(`${STORAGE_KEY}-${user.id}-${LEGACY_BUSINESS_ID}`, legacyTransactions);
+                writeStorage(SESSION_KEY, { userId: user.id, businessId: LEGACY_BUSINESS_ID });
+            }
+        }
+        const summaryPeriod = document.getElementById("summary-period");
+        const summaryIncome = document.getElementById("summary-income");
+        const summaryExpense = document.getElementById("summary-expense");
+        const summaryResultLabel = document.getElementById("summary-result-label");
+        const summaryResult = document.getElementById("summary-result");
+        const reportGrid = document.getElementById("report-grid");
+        const reportIncome = document.getElementById("report-income");
+        const reportExpense = document.getElementById("report-expense");
+        const reportResultLabel = document.getElementById("report-result-label");
+        const reportResult = document.getElementById("report-result");
+        const reportCount = document.getElementById("report-count");
+        const reportLargestIncome = document.getElementById("report-largest-income");
+        const reportLargestExpense = document.getElementById("report-largest-expense");
+        const reportEmpty = document.getElementById("report-empty");
+        const comparisonChart = document.getElementById("comparison-chart");
+        const comparisonEmpty = document.getElementById("comparison-empty");
+        const trendChart = document.getElementById("trend-chart");
+        const trendEmpty = document.getElementById("trend-empty");
 
         function loadTransactions() {
             try {
-                const storedTransactions = JSON.parse(localStorage.getItem(STORAGE_KEY));
-                return Array.isArray(storedTransactions) ? storedTransactions : [];
+                const storedTransactions = currentUser
+                        ? readStorage(businessScopedKey(STORAGE_KEY), readStorage(scopedKey(STORAGE_KEY), []))
+                    : [];
+                if (!Array.isArray(storedTransactions)) {
+                    return [];
+                }
+
+                const normalizedTransactions = storedTransactions.map((transaction) => ({
+                    id: transaction.id || createTransactionId(),
+                    businessId: transaction.businessId || currentBusinessId,
+                    createdBy: transaction.createdBy || currentUser.id,
+                    date: transaction.date || new Date().toISOString(),
+                    type: transaction.type === "expense" ? "expense" : "income",
+                    description: transaction.description || "",
+                    amount: Number(transaction.amount) || 0
+                }));
+                return normalizedTransactions;
             } catch (error) {
                 return [];
+            }
+        }
+
+        function saveTransactions() {
+            if (currentUser && canAccessBusiness(currentBusinessId)) {
+                if (supabaseClient) {
+                    transactions.filter((transaction) => transaction.businessId === currentBusinessId).forEach((transaction) => { void syncTransactionToSupabase(transaction); });
+                    return;
+                }
+                writeStorage(businessScopedKey(STORAGE_KEY), transactions.filter((transaction) => transaction.businessId === currentBusinessId));
             }
         }
 
@@ -361,23 +1583,1416 @@
             return "Rp " + new Intl.NumberFormat("id-ID").format(amount);
         }
 
-        function updateDashboard() {
-            const income = transactions
+        function formatAmountInput(amount) {
+            if (!amount) {
+                return "";
+            }
+
+            return formatRupiah(amount);
+        }
+
+        function getAmountFromInput() {
+            const digits = amountInput.value.replace(/\D/g, "");
+            if (!digits) {
+                return 0;
+            }
+
+            const amount = Number(digits);
+            return Number.isSafeInteger(amount) ? amount : NaN;
+        }
+
+        function formatAmountInputValue() {
+            const cursorPosition = amountInput.selectionStart || 0;
+            const digitsBeforeCursor = amountInput.value.slice(0, cursorPosition).replace(/\D/g, "").length;
+            const digits = amountInput.value.replace(/\D/g, "");
+            const amount = digits ? Number(digits) : 0;
+
+            amountInput.value = digits && Number.isSafeInteger(amount) ? formatAmountInput(amount) : "";
+
+            if (!digits || !Number.isSafeInteger(amount)) {
+                amountInput.setSelectionRange(amountInput.value.length, amountInput.value.length);
+                return;
+            }
+
+            const formattedPrefix = amountInput.value.slice(0, 3);
+            let digitCount = 0;
+            let newCursorPosition = formattedPrefix.length;
+            for (let index = formattedPrefix.length; index < amountInput.value.length; index += 1) {
+                if (/\d/.test(amountInput.value[index])) {
+                    digitCount += 1;
+                }
+                if (digitCount >= digitsBeforeCursor) {
+                    newCursorPosition = index + 1;
+                    break;
+                }
+                newCursorPosition = index + 1;
+            }
+
+            amountInput.setSelectionRange(newCursorPosition, newCursorPosition);
+        }
+
+        function formatDate(dateValue) {
+            const date = new Date(dateValue);
+            if (Number.isNaN(date.getTime())) {
+                return "Tanggal tidak tersedia";
+            }
+
+            return new Intl.DateTimeFormat("id-ID", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                timeZone: "Asia/Jakarta"
+            }).format(date);
+        }
+
+        function getJakartaDateKey(dateValue) {
+            const date = new Date(dateValue);
+            if (Number.isNaN(date.getTime())) {
+                return "";
+            }
+            return new Intl.DateTimeFormat("en-CA", {
+                timeZone: "Asia/Jakarta",
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit"
+            }).format(date);
+        }
+
+        function getSummaryDateRange(period) {
+            const now = new Date();
+            const start = new Date(now.getFullYear(), now.getMonth(), 1);
+            let end = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+
+            if (period === "previous-month") {
+                start.setMonth(start.getMonth() - 1);
+                end = new Date(now.getFullYear(), now.getMonth(), 1);
+            } else if (period === "three-months") {
+                start.setMonth(start.getMonth() - 2);
+            } else if (period === "current-year") {
+                start.setMonth(0);
+                end = new Date(now.getFullYear() + 1, 0, 1);
+            } else if (period === "all") {
+                return null;
+            }
+
+            return { start, end };
+        }
+
+        function getTransactionsForPeriod(period) {
+            const dateRange = getSummaryDateRange(period);
+            if (!dateRange) {
+                return transactions.filter((transaction) => canViewTransaction(transaction));
+            }
+
+            return transactions.filter((transaction) => {
+                if (!canViewTransaction(transaction)) {
+                    return false;
+                }
+                const transactionDate = new Date(transaction.date);
+                return !Number.isNaN(transactionDate.getTime())
+                    && transactionDate >= dateRange.start
+                    && transactionDate < dateRange.end;
+            });
+        }
+
+        function calculateTotals(transactionList) {
+            const income = transactionList
                 .filter((transaction) => transaction.type === "income")
                 .reduce((total, transaction) => total + transaction.amount, 0);
-            const expense = transactions
+            const expense = transactionList
                 .filter((transaction) => transaction.type === "expense")
                 .reduce((total, transaction) => total + transaction.amount, 0);
 
-            incomeTotal.textContent = formatRupiah(income);
-            expenseTotal.textContent = formatRupiah(expense);
-            balanceTotal.textContent = formatRupiah(income - expense);
+            return { income, expense, result: income - expense };
+        }
+
+        function updateResultDisplay(labelElement, amountElement, result) {
+            const isLoss = result < 0;
+            labelElement.textContent = isLoss ? "Rugi Bersih" : "Laba Bersih";
+            amountElement.textContent = formatRupiah(Math.abs(result));
+            amountElement.className = "amount " + (isLoss ? "summary-loss" : "summary-profit");
+        }
+
+        function updateFinancialSummary() {
+            const totals = calculateTotals(getTransactionsForPeriod(summaryPeriod.value));
+            summaryIncome.textContent = formatRupiah(totals.income);
+            summaryExpense.textContent = formatRupiah(totals.expense);
+            updateResultDisplay(summaryResultLabel, summaryResult, totals.result);
+        }
+
+        function isInSelectedPeriod(transactionDate, period) {
+            if (period === "all") {
+                return true;
+            }
+
+            const date = new Date(transactionDate);
+            const today = new Date();
+            if (Number.isNaN(date.getTime())) {
+                return false;
+            }
+
+            if (period === "today") {
+                return date.getFullYear() === today.getFullYear()
+                    && date.getMonth() === today.getMonth()
+                    && date.getDate() === today.getDate();
+            }
+
+            return date.getFullYear() === today.getFullYear() && date.getMonth() === today.getMonth();
+        }
+
+        function getFilteredTransactions() {
+            const searchTerm = searchInput.value.trim().toLowerCase();
+
+            return transactions.filter((transaction) => {
+                const visibleToUser = canViewTransaction(transaction);
+                const matchesSearch = !searchTerm || transaction.description.toLowerCase().includes(searchTerm);
+                const matchesType = typeFilter.value === "all" || transaction.type === typeFilter.value;
+                const matchesPeriod = isInSelectedPeriod(transaction.date, periodFilter.value);
+
+                return visibleToUser && matchesSearch && matchesType && matchesPeriod;
+            });
+        }
+
+        function updateDashboard() {
+            const totals = calculateTotals(transactions);
+
+            incomeTotal.textContent = formatRupiah(totals.income);
+            expenseTotal.textContent = formatRupiah(totals.expense);
+            balanceTotal.textContent = formatRupiah(totals.result);
+            updateResultDisplay(profitTotalLabel, profitTotal, totals.result);
+        }
+
+        function loadWorkspaceData() {
+            staff = currentUser && !supabaseClient ? readStorage(businessScopedKey(STAFF_KEY), readStorage(scopedKey(STAFF_KEY), [])) : [];
+            if (isOwner()) {
+                const businessMembers = readStorage(MEMBERSHIPS_KEY, []).filter((membership) => membership.businessId === currentBusinessId);
+                const users = readStorage(USERS_KEY, []);
+                businessMembers.forEach((membership) => {
+                    const user = users.find((item) => item.id === membership.userId);
+                    if (user && !staff.some((member) => member.id === user.id || member.userId === user.id)) {
+                        staff.push({ id: user.id, userId: user.id, businessId: currentBusinessId, name: user.name, role: membership.role, status: membership.status, joinedAt: membership.joinedAt });
+                    }
+                });
+            }
+            const storedAttendance = currentUser && !supabaseClient ? readStorage(businessScopedKey(ATTENDANCE_KEY), readStorage(scopedKey(ATTENDANCE_KEY), [])) : [];
+            attendance = storedAttendance.map((record) => {
+                const oldCheckInPhoto = record.checkInPhoto || record.photoCheckIn || null;
+                const oldCheckOutPhoto = record.checkOutPhoto || record.photoCheckOut || null;
+                return {
+                    ...record,
+                    businessId: record.businessId || currentBusinessId,
+                    userId: record.userId || record.staffId,
+                    checkInPhoto: oldCheckInPhoto && oldCheckInPhoto.startsWith("data:") ? saveAttendancePhoto(oldCheckInPhoto) : oldCheckInPhoto,
+                    checkOutPhoto: oldCheckOutPhoto && oldCheckOutPhoto.startsWith("data:") ? saveAttendancePhoto(oldCheckOutPhoto) : oldCheckOutPhoto,
+                    createdAt: record.createdAt || record.date,
+                    updatedAt: record.updatedAt || record.date
+                };
+            });
+            attendance = isOwner() ? attendance : attendance.filter((record) => record.userId === currentUser.id);
+        }
+
+        function getMembershipsForBusiness(businessId) {
+            return readStorage(MEMBERSHIPS_KEY, []).filter((membership) => membership.businessId === businessId && membership.status === "active");
+        }
+
+        function renderBusinessSelector() {
+            businessSelector.textContent = "";
+            getUserBusinesses().forEach((business) => {
+                const option = document.createElement("option");
+                option.value = business.id;
+                option.textContent = business.name;
+                businessSelector.appendChild(option);
+            });
+            businessSelector.value = currentBusinessId;
+            const business = getActiveBusiness();
+            activeBusinessLabel.textContent = business ? business.name : "Aplikasi pencatatan transaksi";
+            userNameLabel.textContent = currentUser ? currentUser.name : "";
+        }
+
+        function applyRoleView() {
+            const owner = isOwner();
+            document.querySelectorAll(".owner-only").forEach((element) => {
+                element.hidden = !owner;
+            });
+            staffDashboard.classList.toggle("is-visible", !owner);
+            document.getElementById("add-business-button").hidden = !owner;
+            document.getElementById("edit-business-button").hidden = !owner;
+            document.getElementById("delete-business-button").hidden = !owner;
+            document.getElementById("invite-staff-button").hidden = !owner;
+            document.getElementById("revoke-invitation-button").hidden = !owner;
+            document.getElementById("export-transactions-button").hidden = !owner;
+            document.getElementById("export-excel-button").hidden = !owner;
+            document.getElementById("export-pdf-button").hidden = !owner;
+            document.getElementById("backup-button").hidden = !owner;
+            document.getElementById("restore-button").hidden = !owner;
+            document.getElementById("transactions-title").textContent = owner ? "Transaksi Terakhir" : "Transaksi Saya";
+            document.getElementById("attendance-title").textContent = owner ? "Absensi Staff" : "Absensi Saya";
+            document.querySelectorAll(".owner-nav").forEach((element) => { element.hidden = !owner; });
+            document.querySelectorAll(".staff-nav").forEach((element) => { element.hidden = owner; });
+            updateStaffDashboard();
+        }
+
+        function navigateTo(targetId) {
+            const target = document.getElementById(targetId);
+            if (!target) {
+                return;
+            }
+            if (target.classList.contains("owner-only") && !isOwner()) {
+                window.alert("Akses Ditolak");
+                return;
+            }
+            target.scrollIntoView({ behavior: "smooth", block: "start" });
+            document.querySelectorAll(".app-nav button").forEach((button) => button.classList.toggle("is-active", button.dataset.target === targetId));
+        }
+
+        function updateStaffDashboard() {
+            const today = new Date();
+            const visibleTransactions = transactions.filter((transaction) => canViewTransaction(transaction));
+            const todayCount = visibleTransactions.filter((transaction) => {
+                const date = new Date(transaction.date);
+                return date.getFullYear() === today.getFullYear()
+                    && date.getMonth() === today.getMonth()
+                    && date.getDate() === today.getDate();
+            }).length;
+            staffTodayCount.textContent = todayCount;
+            staffTotalCount.textContent = visibleTransactions.length;
+        }
+
+        function renderStaffRequests() {
+            staffRequestList.textContent = "";
+            if (isOwner()) {
+                return;
+            }
+            const requests = getEditRequests().filter((request) => request.businessId === currentBusinessId && request.requestedBy === currentUser.id);
+            if (requests.length === 0) {
+                const empty = document.createElement("p");
+                empty.className = "empty-state";
+                empty.textContent = "Belum ada pengajuan edit.";
+                staffRequestList.appendChild(empty);
+                return;
+            }
+            requests.slice().reverse().forEach((request) => {
+                const row = document.createElement("article");
+                row.className = "staff-row";
+                const status = request.status === "approved" ? "Disetujui" : request.status === "rejected" ? "Ditolak" : "Menunggu Approval";
+                const title = document.createElement("p");
+                title.textContent = request.oldData.description;
+                const meta = document.createElement("p");
+                meta.className = "staff-meta";
+                meta.textContent = `${status} · ${request.reason}`;
+                row.append(title, meta);
+                staffRequestList.appendChild(row);
+            });
+        }
+
+        function saveWorkspaceData() {
+            if (!currentUser) {
+                return;
+            }
+            writeStorage(businessScopedKey(STAFF_KEY), staff);
+            if (isOwner()) {
+                writeStorage(businessScopedKey(ATTENDANCE_KEY), attendance);
+            } else {
+                const storedAttendance = readStorage(businessScopedKey(ATTENDANCE_KEY), []);
+                const otherAttendance = storedAttendance.filter((record) => (record.userId || record.staffId) !== currentUser.id);
+                writeStorage(businessScopedKey(ATTENDANCE_KEY), [...otherAttendance, ...attendance]);
+            }
+        }
+
+        function renderStaff() {
+            staffList.textContent = "";
+            if (!isOwner()) {
+                staffList.hidden = true;
+                attendanceStaff.textContent = "";
+                const ownOption = document.createElement("option");
+                ownOption.value = currentUser.id;
+                ownOption.textContent = currentUser.name;
+                attendanceStaff.appendChild(ownOption);
+                attendanceStaff.value = currentUser.id;
+                return;
+            }
+            staffList.hidden = false;
+            if (staff.length === 0) {
+                const empty = document.createElement("p");
+                empty.className = "empty-state";
+                empty.textContent = "Belum ada staff.";
+                staffList.appendChild(empty);
+                attendanceStaff.innerHTML = "<option value=''>Belum ada staff</option>";
+                return;
+            }
+
+            attendanceStaff.textContent = "";
+            staff.forEach((member) => {
+                const option = document.createElement("option");
+                option.value = member.id;
+                option.textContent = member.name;
+                attendanceStaff.appendChild(option);
+
+                const row = document.createElement("article");
+                row.className = "staff-row";
+                const details = document.createElement("div");
+                const name = document.createElement("p");
+                name.textContent = member.name;
+                const meta = document.createElement("p");
+                meta.className = "staff-meta";
+                meta.textContent = member.role || "Staff";
+                details.append(name, meta);
+                const edit = document.createElement("button");
+                edit.className = "edit-button";
+                edit.type = "button";
+                edit.textContent = "Edit";
+                edit.addEventListener("click", () => {
+                    const updatedName = window.prompt("Nama staff:", member.name);
+                    if (updatedName && updatedName.trim()) {
+                        member.name = updatedName.trim();
+                        saveWorkspaceData();
+                        renderStaff();
+                    }
+                });
+                const detail = document.createElement("button");
+                detail.className = "toolbar-button";
+                detail.type = "button";
+                detail.textContent = "Detail";
+                detail.addEventListener("click", () => renderStaffDetail(member));
+                const remove = document.createElement("button");
+                remove.className = "delete-button";
+                remove.type = "button";
+                remove.textContent = "Hapus";
+                remove.addEventListener("click", () => {
+                    if (window.confirm(`Hapus staff ${member.name}?`)) {
+                        if (supabaseClient && member.userId) {
+                            void supabaseClient.from("business_members").update({ status: "revoked" }).eq("business_id", currentBusinessId).eq("user_id", member.userId).then(({ error }) => {
+                                if (error) throw error;
+                                return hydrateSupabaseWorkspace(currentUser);
+                            }).then(() => { renderBusinessSelector(); loadWorkspaceData(); renderStaff(); }).catch((error) => window.alert(`Membership gagal dicabut: ${error.message}`));
+                            return;
+                        }
+                        staff = staff.filter((item) => item.id !== member.id);
+                        attendance = attendance.filter((item) => item.staffId !== member.id);
+                        if (member.userId) {
+                            const memberships = readStorage(MEMBERSHIPS_KEY, []);
+                            memberships.forEach((membership) => {
+                                if (membership.businessId === currentBusinessId && membership.userId === member.userId) {
+                                    membership.status = "revoked";
+                                }
+                            });
+                            writeStorage(MEMBERSHIPS_KEY, memberships);
+                        }
+                        saveWorkspaceData();
+                        recordAudit("staff_removed", "staff", member.id, member, null);
+                        renderStaff();
+                        renderAttendance();
+                    }
+                });
+                const toggle = document.createElement("button");
+                toggle.className = "toolbar-button";
+                toggle.type = "button";
+                toggle.textContent = member.status === "Nonaktif" ? "Aktifkan" : "Nonaktifkan";
+                toggle.addEventListener("click", () => {
+                    if (!member.userId) {
+                        member.status = member.status === "Nonaktif" ? "Aktif" : "Nonaktif";
+                        saveWorkspaceData();
+                        renderStaff();
+                        return;
+                    }
+                    const memberships = readStorage(MEMBERSHIPS_KEY, []);
+                    const membership = memberships.find((item) => item.businessId === currentBusinessId && item.userId === member.userId);
+                    if (membership) {
+                        membership.status = membership.status === "active" ? "inactive" : "active";
+                        member.status = membership.status === "active" ? "Aktif" : "Nonaktif";
+                        writeStorage(MEMBERSHIPS_KEY, memberships);
+                        recordAudit("staff_status_changed", "staff", member.id, null, membership);
+                        renderStaff();
+                    }
+                });
+                const actions = document.createElement("div");
+                actions.className = "transaction-actions";
+                actions.append(detail, edit, toggle, remove);
+                row.append(details, actions);
+                staffList.appendChild(row);
+            });
+        }
+
+        function renderStaffDetail(member) {
+            if (!isOwner()) {
+                return;
+            }
+            const memberUserId = member.userId || member.id;
+            const memberUser = readStorage(USERS_KEY, []).find((user) => user.id === memberUserId);
+            const memberTransactions = transactions.filter((transaction) => transaction.createdBy === memberUserId && transaction.businessId === currentBusinessId);
+            const memberAttendance = attendance.filter((record) => record.userId === memberUserId);
+            staffDetail.hidden = false;
+            staffDetail.textContent = "";
+            const title = document.createElement("h3");
+            title.textContent = member.name;
+            const info = document.createElement("p");
+            info.className = "staff-meta";
+            info.textContent = `${memberUser ? memberUser.email : "Email belum tersedia"} · ${member.role || "Staff"} · ${member.status || "Aktif"} · Transaksi ${memberTransactions.length} · Absensi ${memberAttendance.length}`;
+            const close = document.createElement("button");
+            close.className = "toolbar-button";
+            close.type = "button";
+            close.textContent = "Tutup Detail";
+            close.addEventListener("click", () => { staffDetail.hidden = true; });
+            staffDetail.append(title, info, close);
+        }
+
+        function updateAttendanceStaffFilter() {
+            const selected = attendanceFilterStaff.value;
+            attendanceFilterStaff.textContent = "";
+            const all = document.createElement("option");
+            all.value = "all";
+            all.textContent = isOwner() ? "Semua Staff" : "Saya";
+            attendanceFilterStaff.appendChild(all);
+            if (isOwner()) {
+                staff.forEach((member) => {
+                    const option = document.createElement("option");
+                    option.value = member.userId || member.id;
+                    option.textContent = member.name;
+                    attendanceFilterStaff.appendChild(option);
+                });
+            }
+            attendanceFilterStaff.value = Array.from(attendanceFilterStaff.options).some((option) => option.value === selected) ? selected : "all";
+        }
+
+        function isAttendanceInPeriod(record, period) {
+            if (period === "all") {
+                return true;
+            }
+            const recordDate = new Date(record.date);
+            const now = new Date();
+            if (Number.isNaN(recordDate.getTime())) {
+                return false;
+            }
+            if (period === "today") {
+                return getJakartaDateKey(record.date) === getJakartaDateKey(now);
+            }
+            if (period === "week") {
+                const start = new Date(now);
+                start.setHours(0, 0, 0, 0);
+                start.setDate(now.getDate() - now.getDay());
+                return recordDate >= start;
+            }
+            if (period === "month") {
+                const recordParts = new Intl.DateTimeFormat("en", { timeZone: "Asia/Jakarta", year: "numeric", month: "numeric" }).formatToParts(recordDate);
+                const nowParts = new Intl.DateTimeFormat("en", { timeZone: "Asia/Jakarta", year: "numeric", month: "numeric" }).formatToParts(now);
+                return recordParts.find((part) => part.type === "year").value === nowParts.find((part) => part.type === "year").value
+                    && recordParts.find((part) => part.type === "month").value === nowParts.find((part) => part.type === "month").value;
+            }
+            const from = attendanceFilterFrom.value ? new Date(`${attendanceFilterFrom.value}T00:00:00`) : null;
+            const to = attendanceFilterTo.value ? new Date(`${attendanceFilterTo.value}T23:59:59`) : null;
+            return (!from || recordDate >= from) && (!to || recordDate <= to);
+        }
+
+        function getFilteredAttendance() {
+            return attendance.filter((record) => {
+                if (!canViewAttendance(record)) {
+                    return false;
+                }
+                const matchesStaff = attendanceFilterStaff.value === "all" || record.userId === attendanceFilterStaff.value;
+                const matchesPeriod = isAttendanceInPeriod(record, attendanceFilterPeriod.value);
+                const matchesStatus = attendanceFilterStatus.value === "all" || record.status === attendanceFilterStatus.value;
+                return matchesStaff && matchesPeriod && matchesStatus;
+            });
+        }
+
+        async function appendAttendancePhoto(container, photoId, label) {
+            const photo = supabaseClient && photoId
+                ? (await supabaseClient.storage.from("attendance").createSignedUrl(photoId, 300)).data?.signedUrl
+                : getAttendancePhoto(photoId);
+            if (!photo) {
+                return;
+            }
+            const image = document.createElement("img");
+            image.src = photo;
+            image.alt = label;
+            container.appendChild(image);
+        }
+
+        function renderAttendance() {
+            updateAttendanceStaffFilter();
+            attendanceList.textContent = "";
+            const filteredAttendance = getFilteredAttendance();
+            if (filteredAttendance.length === 0) {
+                const empty = document.createElement("p");
+                empty.className = "empty-state";
+                empty.textContent = "Belum ada data absensi untuk periode ini.";
+                attendanceList.appendChild(empty);
+                return;
+            }
+
+            filteredAttendance.slice().reverse().forEach((record) => {
+                const member = staff.find((item) => (item.userId || item.id) === record.userId);
+                const row = document.createElement("article");
+                row.className = "attendance-row";
+                const details = document.createElement("div");
+                const name = document.createElement("p");
+                name.textContent = member ? member.name : (record.userId === currentUser.id ? currentUser.name : "Staff");
+                const meta = document.createElement("p");
+                meta.className = "attendance-meta";
+                meta.textContent = `${formatDate(record.date)} · Masuk ${formatTime(record.checkIn)} · Keluar ${formatTime(record.checkOut)}`;
+                details.append(name, meta);
+                const photos = document.createElement("div");
+                photos.className = "attendance-photo-preview";
+                void appendAttendancePhoto(photos, record.checkInPhoto, "Foto check-in");
+                void appendAttendancePhoto(photos, record.checkOutPhoto, "Foto check-out");
+                details.appendChild(photos);
+                const action = document.createElement("button");
+                action.className = record.checkOut ? "toolbar-button" : "submit-button";
+                action.type = "button";
+                action.textContent = record.checkOut ? "Selesai" : "Check Out";
+                action.hidden = isOwner();
+                action.disabled = Boolean(record.checkOut) || (!isOwner() && record.userId !== currentUser.id);
+                action.addEventListener("click", () => startCheckout(record.id));
+                row.append(details, action);
+                attendanceList.appendChild(row);
+            });
+        }
+
+        function renderApprovals() {
+            approvalList.textContent = "";
+            if (!isOwner()) {
+                return;
+            }
+            const requests = getEditRequests().filter((request) => request.businessId === currentBusinessId && request.status === "pending");
+            if (requests.length === 0) {
+                const empty = document.createElement("p");
+                empty.className = "empty-state";
+                empty.textContent = "Belum ada permintaan edit.";
+                approvalList.appendChild(empty);
+                return;
+            }
+            requests.forEach((request) => {
+                const row = document.createElement("article");
+                row.className = "staff-row";
+                const details = document.createElement("div");
+                const title = document.createElement("p");
+                title.textContent = `${request.oldData.description}: ${formatRupiah(request.oldData.amount)} menjadi ${formatRupiah(request.newData.amount)}`;
+                const meta = document.createElement("p");
+                meta.className = "staff-meta";
+                meta.textContent = `Alasan: ${request.reason}`;
+                details.append(title, meta);
+                const approve = document.createElement("button");
+                approve.className = "submit-button";
+                approve.type = "button";
+                approve.textContent = "Setujui";
+                approve.addEventListener("click", () => reviewEditRequest(request.id, "approved"));
+                const reject = document.createElement("button");
+                reject.className = "delete-button";
+                reject.type = "button";
+                reject.textContent = "Tolak";
+                reject.addEventListener("click", () => reviewEditRequest(request.id, "rejected"));
+                const actions = document.createElement("div");
+                actions.className = "transaction-actions";
+                actions.append(approve, reject);
+                row.append(details, actions);
+                approvalList.appendChild(row);
+            });
+        }
+
+        function reviewEditRequest(requestId, status) {
+            if (!canApproveTransaction() || !canManageBusiness()) {
+                return;
+            }
+            if (supabaseClient) {
+                void supabaseClient.rpc("review_transaction_edit", { p_request_id: requestId, p_status: status, p_review_note: null }).then(({ error }) => {
+                    if (error) throw error;
+                    return reloadAuthenticatedWorkspace();
+                }).catch((error) => window.alert(`Approval gagal: ${error.message}`));
+                return;
+            }
+            const requests = readStorage(EDIT_REQUESTS_KEY, []);
+            const request = requests.find((item) => item.id === requestId && item.businessId === currentBusinessId && item.status === "pending");
+            if (!request) {
+                return;
+            }
+            request.status = status;
+            request.reviewedBy = currentUser.id;
+            request.reviewedAt = new Date().toISOString();
+            if (status === "approved") {
+                const transactionIndex = transactions.findIndex((transaction) => transaction.id === request.transactionId);
+                if (transactionIndex !== -1) {
+                    transactions[transactionIndex] = { ...transactions[transactionIndex], ...request.newData };
+                    saveTransactions();
+                }
+            }
+            writeStorage(EDIT_REQUESTS_KEY, requests);
+            if (supabaseClient) {
+                void supabaseClient.from("transaction_edit_requests").update({
+                    status,
+                    reviewed_by: currentUser.id,
+                    reviewed_at: request.reviewedAt
+                }).eq("id", request.supabaseId || request.id).eq("business_id", currentBusinessId).then(({ error }) => {
+                    if (error) console.error("Tracktrans approval sync failed", error.message);
+                });
+            }
+            recordAudit(`transaction_edit_${status}`, "transaction", request.transactionId, request.oldData, request.newData);
+            updateDashboard();
+            renderReportsAndCharts();
+            renderTransactions();
+            renderApprovals();
+        }
+
+        function formatTime(value) {
+            if (!value) {
+                return "-";
+            }
+            return new Intl.DateTimeFormat("id-ID", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Jakarta" }).format(new Date(value));
+        }
+
+        function readPhotoFile(file) {
+            return new Promise((resolve) => {
+                if (!file) {
+                    resolve(null);
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => resolve(null);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function renderPhotoPreview(input, container) {
+            container.textContent = "";
+            const file = input.files[0];
+            if (!file) {
+                return;
+            }
+            const image = document.createElement("img");
+            image.alt = "Preview foto absensi";
+            image.src = URL.createObjectURL(file);
+            container.appendChild(image);
+        }
+
+        function startCheckout(attendanceId) {
+            const record = attendance.find((item) => item.id === attendanceId);
+            if (!record || record.checkOut || (!isOwner() && record.userId !== currentUser.id)) {
+                return;
+            }
+            pendingCheckoutAttendanceId = attendanceId;
+            attendanceCheckoutPhoto.value = "";
+            attendanceCheckoutPhoto.click();
+        }
+
+        function downloadFile(filename, content, type) {
+            const blob = new Blob([content], { type });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = filename;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function exportTransactionsCsv() {
+            if (!isOwner()) {
+                window.alert("Hanya Owner yang dapat melakukan export.");
+                return;
+            }
+            const rows = [["Tanggal", "Keterangan", "Jenis Transaksi", "Nominal"]];
+            transactions.forEach((transaction) => rows.push([
+                formatDate(transaction.date),
+                transaction.description,
+                transaction.type === "income" ? "Pemasukan" : "Pengeluaran",
+                transaction.amount
+            ]));
+            const csv = rows.map((row) => row.map((value) => `"${String(value).replaceAll('"', '""')}"`).join(",")).join("\n");
+            const business = getActiveBusiness();
+            downloadFile(`Tracktrans_Transaksi_${business ? business.name.replace(/\W+/g, "_") : "Bisnis"}.csv`, csv, "text/csv;charset=utf-8");
+        }
+
+        function exportTransactionsExcel() {
+            if (!isOwner()) {
+                window.alert("Hanya Owner yang dapat melakukan export.");
+                return;
+            }
+            const business = getActiveBusiness();
+            const rows = transactions.map((transaction) => `<tr><td>${formatDate(transaction.date)}</td><td>${transaction.description}</td><td>${transaction.type === "income" ? "Pemasukan" : "Pengeluaran"}</td><td>${transaction.amount}</td></tr>`).join("");
+            const workbook = `<table><tr><th>Tanggal</th><th>Keterangan</th><th>Jenis Transaksi</th><th>Nominal</th></tr>${rows}</table>`;
+            downloadFile(`Tracktrans_Transaksi_${business ? business.name.replace(/\W+/g, "_") : "Bisnis"}.xls`, workbook, "application/vnd.ms-excel");
+        }
+
+        function exportTransactionsPdf() {
+            if (!isOwner()) {
+                window.alert("Hanya Owner yang dapat melakukan export.");
+                return;
+            }
+            const business = getActiveBusiness();
+            const rows = transactions.map((transaction) => `<tr><td>${formatDate(transaction.date)}</td><td>${transaction.description}</td><td>${transaction.type === "income" ? "Pemasukan" : "Pengeluaran"}</td><td>${formatRupiah(transaction.amount)}</td></tr>`).join("");
+            const report = window.open("", "_blank");
+            if (!report) {
+                window.alert("Izinkan pop-up browser untuk mencetak laporan PDF.");
+                return;
+            }
+            report.document.write(`<html><head><title>Tracktrans - ${business ? business.name : "Laporan"}</title><style>body{font-family:Arial;padding:24px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:8px;text-align:left}</style></head><body><h1>Tracktrans</h1><h2>${business ? business.name : "Laporan Keuangan"}</h2><p>Diekspor ${new Date().toLocaleString("id-ID")}</p><table><tr><th>Tanggal</th><th>Keterangan</th><th>Jenis</th><th>Nominal</th></tr>${rows}</table><p>Pemasukan: ${formatRupiah(calculateTotals(transactions).income)}</p><p>Pengeluaran: ${formatRupiah(calculateTotals(transactions).expense)}</p><p>Laba/Rugi: ${formatRupiah(Math.abs(calculateTotals(transactions).result))}</p></body></html>`);
+            report.document.close();
+            report.focus();
+            report.print();
+        }
+
+        function createBackup() {
+            if (!isOwner()) {
+                window.alert("Hanya Owner yang dapat membuat backup.");
+                return;
+            }
+            const business = getActiveBusiness();
+            const backup = {
+                version: 2,
+                label: "Backup Prototype - export lokal, bukan database backup production",
+                exportedAt: new Date().toISOString(),
+                user: currentUser,
+                business,
+                transactions,
+                staff,
+                attendance
+            };
+            downloadFile(`Tracktrans_Backup_${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(backup, null, 2), "application/json");
+        }
+
+        function createStaffInvitation() {
+            if (!canManageBusiness()) {
+                window.alert("Hanya Owner bisnis aktif yang dapat mengundang Staff.");
+                return;
+            }
+            if (supabaseClient) {
+                void createSupabaseInvitation().then(({ link }) => {
+                    if (navigator.clipboard) navigator.clipboard.writeText(link).catch(() => {});
+                    window.prompt("Link undangan Supabase berhasil dibuat:", link);
+                }).catch((error) => window.alert(`Invitation gagal dibuat: ${error.message}`));
+                return;
+            }
+            const token = createId("invite");
+            const invitation = {
+                id: createId("invitation"), token, ownerId: currentUser.id, businessId: currentBusinessId,
+                role: "staff", createdAt: new Date().toISOString(), expiresAt: new Date(Date.now() + 7 * 86400000).toISOString(), status: "pending", usedBy: null
+            };
+            const invitations = readStorage(INVITATIONS_KEY, []);
+            invitations.push(invitation);
+            writeStorage(INVITATIONS_KEY, invitations);
+            recordAudit("invitation_created", "invitation", invitation.id, null, invitation);
+            const link = `${window.location.origin}${window.location.pathname}?invite=${encodeURIComponent(token)}`;
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(link).catch(() => {});
+            }
+            window.prompt("Link undangan berhasil dibuat dan dicopy jika diizinkan browser:", link);
+        }
+
+        function revokeLatestInvitation() {
+            if (!canManageBusiness()) {
+                return;
+            }
+            const invitations = readStorage(INVITATIONS_KEY, []);
+            const invitation = invitations.slice().reverse().find((item) => item.businessId === currentBusinessId && item.status === "pending");
+            if (!invitation) {
+                window.alert("Tidak ada undangan pending untuk bisnis ini.");
+                return;
+            }
+            invitation.status = "revoked";
+            writeStorage(INVITATIONS_KEY, invitations);
+            recordAudit("invitation_revoked", "invitation", invitation.id, null, invitation);
+            window.alert("Undangan berhasil dicabut.");
+        }
+
+        function processPendingInvitation() {
+            const token = new URLSearchParams(window.location.search).get("invite");
+            if (!token || !currentUser) {
+                return;
+            }
+            if (supabaseClient) {
+                void acceptSupabaseInvitation(token).then(() => {
+                    window.history.replaceState({}, "", window.location.pathname);
+                    window.alert("Undangan berhasil diterima.");
+                    return hydrateSupabaseWorkspace(currentUser);
+                }).then(() => reloadAuthenticatedWorkspace()).catch((error) => window.alert(`Undangan tidak dapat diterima: ${error.message}`));
+                return;
+            }
+            const invitations = readStorage(INVITATIONS_KEY, []);
+            const invitation = invitations.find((item) => item.token === token);
+            if (!invitation) {
+                window.alert("Link undangan tidak valid.");
+                return;
+            }
+            if (invitation.status === "accepted" && invitation.usedBy === currentUser.id) {
+                window.history.replaceState({}, "", window.location.pathname);
+                return;
+            }
+            if (invitation.status === "revoked") {
+                window.alert("Undangan sudah dibatalkan oleh Owner.");
+                return;
+            }
+            if (invitation.status !== "pending" || new Date(invitation.expiresAt) <= new Date()) {
+                invitation.status = "expired";
+                writeStorage(INVITATIONS_KEY, invitations);
+                window.alert("Link undangan sudah kedaluwarsa atau sudah digunakan.");
+                return;
+            }
+            if (!window.confirm("Anda diundang untuk bergabung sebagai Staff. Terima undangan ini?")) {
+                return;
+            }
+            const memberships = readStorage(MEMBERSHIPS_KEY, []);
+            if (!memberships.some((membership) => membership.userId === currentUser.id && membership.businessId === invitation.businessId)) {
+                memberships.push({ id: createId("membership"), businessId: invitation.businessId, userId: currentUser.id, role: "staff", invitedBy: invitation.ownerId, joinedAt: new Date().toISOString(), status: "active" });
+                writeStorage(MEMBERSHIPS_KEY, memberships);
+            }
+            invitation.status = "accepted";
+            invitation.usedBy = currentUser.id;
+            writeStorage(INVITATIONS_KEY, invitations);
+            recordAudit("invitation_accepted", "invitation", invitation.id, null, invitation);
+            writeStorage(SESSION_KEY, { userId: currentUser.id, businessId: invitation.businessId });
+            window.location.href = window.location.pathname;
+        }
+
+        function getPendingInvitation() {
+            const token = new URLSearchParams(window.location.search).get("invite");
+            if (!token) {
+                return null;
+            }
+            return readStorage(INVITATIONS_KEY, []).find((item) => item.token === token && item.status === "pending" && new Date(item.expiresAt) > new Date()) || null;
+        }
+
+        function showAuthenticatedApp() {
+            authOverlay.hidden = Boolean(currentUser);
+            if (!currentUser) {
+                return;
+            }
+            renderBusinessSelector();
+            applyRoleView();
+            loadWorkspaceData();
+            renderStaff();
+            renderAttendance();
+            renderApprovals();
+            renderStaffRequests();
+            processPendingInvitation();
+        }
+
+            authModeToggle.addEventListener("click", () => {
+                authMode = authMode === "login" ? "register" : "login";
+                const registering = authMode === "register";
+                authTitle.textContent = registering ? "Daftar Tracktrans" : "Masuk ke Tracktrans";
+                authDescription.textContent = registering ? "Buat akun lokal untuk workspace terpisah." : "Gunakan akun lokal untuk mengakses workspace.";
+                authName.hidden = !registering;
+                authName.required = registering;
+                authPassword.autocomplete = registering ? "new-password" : "current-password";
+                authSubmit.textContent = registering ? "Daftar" : "Masuk";
+                authModeToggle.textContent = registering ? "Sudah punya akun? Masuk" : "Belum punya akun? Daftar";
+                authError.textContent = "";
+            });
+
+            authForm.addEventListener("submit", async (event) => {
+                event.preventDefault();
+                const email = authEmail.value.trim().toLowerCase();
+                const password = authPassword.value;
+                const users = readStorage(USERS_KEY, []);
+                authError.textContent = "";
+                if (isSupabaseConfigured && authMode === "reset") {
+                    const { error } = await supabaseClient.auth.updateUser({ password });
+                    if (error) {
+                        authError.textContent = error.message;
+                        return;
+                    }
+                    authError.textContent = "Password berhasil diperbarui. Silakan masuk kembali.";
+                    await supabaseClient.auth.signOut();
+                    return;
+                }
+                if (!email || !email.includes("@") || password.length < 6) {
+                    authError.textContent = "Email valid dan password minimal 6 karakter wajib diisi.";
+                    return;
+                }
+
+                if (isSupabaseConfigured) {
+                    await submitSupabaseAuth(email, password, authMode === "register");
+                    return;
+                }
+
+                const passwordHash = await hashPassword(password);
+                if (authMode === "register") {
+                    if (users.some((user) => user.email === email)) {
+                        authError.textContent = "Email sudah terdaftar.";
+                        return;
+                    }
+                    const pendingInvitation = getPendingInvitation();
+                    const user = { id: createId("user"), name: authName.value.trim(), email, passwordHash, role: pendingInvitation ? "staff" : "owner", createdAt: new Date().toISOString() };
+                    users.push(user);
+                    writeStorage(USERS_KEY, users);
+                    if (pendingInvitation) {
+                        const memberships = readStorage(MEMBERSHIPS_KEY, []);
+                        memberships.push({ id: createId("membership"), businessId: pendingInvitation.businessId, userId: user.id, role: "staff", invitedBy: pendingInvitation.ownerId, joinedAt: new Date().toISOString(), status: "active" });
+                        writeStorage(MEMBERSHIPS_KEY, memberships);
+                        const invitations = readStorage(INVITATIONS_KEY, []);
+                        const invitationIndex = invitations.findIndex((item) => item.id === pendingInvitation.id);
+                        invitations[invitationIndex].status = "accepted";
+                        invitations[invitationIndex].usedBy = user.id;
+                        writeStorage(INVITATIONS_KEY, invitations);
+                        writeStorage(SESSION_KEY, { userId: user.id, businessId: pendingInvitation.businessId });
+                    } else {
+                        const business = { id: createId("business"), ownerId: user.id, name: "Bisnis Utama", description: "", createdAt: new Date().toISOString() };
+                        const businesses = readStorage(BUSINESSES_KEY, []);
+                        businesses.push(business);
+                        writeStorage(BUSINESSES_KEY, businesses);
+                        writeStorage(SESSION_KEY, { userId: user.id, businessId: business.id });
+                    }
+                } else {
+                    const user = users.find((item) => item.email === email && item.passwordHash === passwordHash);
+                    if (!user) {
+                        authError.textContent = "Email atau password tidak cocok.";
+                        return;
+                    }
+                    const userBusiness = readStorage(BUSINESSES_KEY, []).find((item) => item.ownerId === user.id);
+                    writeStorage(SESSION_KEY, { userId: user.id, businessId: userBusiness ? userBusiness.id : LEGACY_BUSINESS_ID });
+                }
+                window.location.reload();
+            });
+
+            forgotPasswordButton.addEventListener("click", async () => {
+                if (!isSupabaseConfigured) {
+                    authError.textContent = "Reset password membutuhkan konfigurasi Supabase.";
+                    return;
+                }
+                const email = authEmail.value.trim().toLowerCase();
+                if (!email || !email.includes("@")) {
+                    authError.textContent = "Masukkan email terlebih dahulu.";
+                    return;
+                }
+                const redirectTo = `${window.location.origin}${window.location.pathname}?reset=1`;
+                const { error } = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo });
+                authError.textContent = error ? error.message : "Link reset password telah dikirim jika email terdaftar.";
+            });
+
+            document.getElementById("logout-button").addEventListener("click", () => {
+                if (supabaseClient) {
+                    supabaseClient.auth.signOut().finally(() => window.location.reload());
+                } else {
+                    localStorage.removeItem(SESSION_KEY);
+                    window.location.reload();
+                }
+            });
+
+            document.querySelectorAll(".app-nav button").forEach((button) => {
+                button.addEventListener("click", () => navigateTo(button.dataset.target));
+            });
+
+            document.getElementById("invite-staff-button").addEventListener("click", createStaffInvitation);
+            document.getElementById("revoke-invitation-button").addEventListener("click", revokeLatestInvitation);
+
+            businessSelector.addEventListener("change", () => {
+                const selectedBusiness = getUserBusinesses().find((business) => business.id === businessSelector.value);
+                if (!selectedBusiness) {
+                    return;
+                }
+                writeStorage(SESSION_KEY, { userId: currentUser.id, businessId: selectedBusiness.id });
+                window.location.reload();
+            });
+
+            document.getElementById("add-business-button").addEventListener("click", () => {
+                const name = window.prompt("Nama bisnis baru:");
+                if (!name || !name.trim() || !canManageBusiness(currentBusinessId)) {
+                    return;
+                }
+                if (supabaseClient) {
+                    void supabaseClient.rpc("create_business", { p_name: name.trim(), p_description: null }).then(({ data, error }) => {
+                        if (error) throw error;
+                        writeStorage(SESSION_KEY, { userId: currentUser.id, businessId: data.id });
+                        window.location.reload();
+                    }).catch((error) => window.alert(`Business gagal dibuat: ${error.message}`));
+                    return;
+                }
+                const businesses = readStorage(BUSINESSES_KEY, []);
+                const business = { id: createId("business"), ownerId: currentUser.id, name: name.trim(), description: "", createdAt: new Date().toISOString() };
+                businesses.push(business);
+                writeStorage(BUSINESSES_KEY, businesses);
+                writeStorage(SESSION_KEY, { userId: currentUser.id, businessId: business.id });
+                window.location.reload();
+            });
+
+            document.getElementById("edit-business-button").addEventListener("click", () => {
+                const business = getActiveBusiness();
+                if (!business || !canManageBusiness(business.id)) {
+                    return;
+                }
+                const name = window.prompt("Nama bisnis:", business.name);
+                if (name && name.trim()) {
+                    if (supabaseClient) {
+                        void supabaseClient.from("businesses").update({ name: name.trim() }).eq("id", business.id).eq("owner_id", currentUser.id).then(({ error }) => {
+                            if (error) throw error;
+                            window.location.reload();
+                        }).catch((error) => window.alert(`Business gagal diperbarui: ${error.message}`));
+                        return;
+                    }
+                    const businesses = readStorage(BUSINESSES_KEY, []);
+                    const index = businesses.findIndex((item) => item.id === business.id && item.ownerId === currentUser.id);
+                    if (index !== -1) {
+                        businesses[index].name = name.trim();
+                        writeStorage(BUSINESSES_KEY, businesses);
+                        renderBusinessSelector();
+                    }
+                }
+            });
+
+            document.getElementById("delete-business-button").addEventListener("click", () => {
+                if (!canManageBusiness()) {
+                    return;
+                }
+                const businesses = readStorage(BUSINESSES_KEY, []);
+                if (businesses.filter((business) => business.ownerId === currentUser.id).length <= 1) {
+                    window.alert("Setiap akun harus memiliki setidaknya satu bisnis.");
+                    return;
+                }
+                if (!window.confirm("Hapus bisnis aktif beserta data workspace-nya?")) {
+                    return;
+                }
+                if (supabaseClient) {
+                    void supabaseClient.from("businesses").delete().eq("id", currentBusinessId).eq("owner_id", currentUser.id).then(({ error }) => {
+                        if (error) throw error;
+                        const nextBusiness = getUserBusinesses().find((business) => business.id !== currentBusinessId);
+                        if (nextBusiness) writeStorage(SESSION_KEY, { userId: currentUser.id, businessId: nextBusiness.id });
+                        window.location.reload();
+                    }).catch((error) => window.alert(`Business gagal dihapus: ${error.message}`));
+                    return;
+                }
+                writeStorage(BUSINESSES_KEY, businesses.filter((business) => business.id !== currentBusinessId || business.ownerId !== currentUser.id));
+                const nextBusiness = businesses.find((business) => business.ownerId === currentUser.id && business.id !== currentBusinessId);
+                writeStorage(SESSION_KEY, { userId: currentUser.id, businessId: nextBusiness.id });
+                window.location.reload();
+            });
+
+            staffForm.addEventListener("submit", (event) => {
+                event.preventDefault();
+                if (!canManageBusiness()) {
+                    staffError.textContent = "Hanya Owner yang dapat mengelola staff.";
+                    return;
+                }
+                if (supabaseClient) {
+                    staffError.textContent = "Gunakan Undang Staff agar membership tersimpan di Supabase.";
+                    return;
+                }
+                const name = staffNameInput.value.trim();
+                if (!name) {
+                    staffError.textContent = "Nama staff wajib diisi.";
+                    return;
+                }
+                staffError.textContent = "";
+                const newStaff = { id: createId("staff"), businessId: currentBusinessId, name, role: staffRoleInput.value.trim(), createdAt: new Date().toISOString(), status: "Aktif" };
+                staff.push(newStaff);
+                saveWorkspaceData();
+                recordAudit("staff_added", "staff", newStaff.id, null, newStaff);
+                staffForm.reset();
+                renderStaff();
+            });
+
+            attendanceForm.addEventListener("submit", async (event) => {
+                event.preventDefault();
+                const staffId = attendanceStaff.value;
+                if (!staffId) {
+                    attendanceError.textContent = "Pilih staff terlebih dahulu.";
+                    return;
+                }
+                attendanceError.textContent = "";
+                const attendanceUserId = isOwner() ? (staff.find((member) => (member.userId || member.id) === staffId)?.userId || staffId) : currentUser.id;
+                const today = new Date();
+                const openToday = attendance.find((record) => {
+                    const recordDate = new Date(record.date);
+                    return record.userId === attendanceUserId
+                        && getJakartaDateKey(record.date) === getJakartaDateKey(today)
+                        && !record.checkOut;
+                });
+                if (openToday) {
+                    attendanceError.textContent = "Staff masih memiliki check-in aktif hari ini.";
+                    return;
+                }
+                if (!attendancePhoto.files[0]) {
+                    attendanceError.textContent = "Foto check-in wajib diambil atau dipilih.";
+                    return;
+                }
+                const now = new Date().toISOString();
+                const photoData = await readPhotoFile(attendancePhoto.files[0]);
+                if (supabaseClient) {
+                    try {
+                        const photoPath = await uploadSupabaseAttendancePhoto(photoData, "check-in");
+                        await supabaseClient.rpc("check_in", { p_business_id: currentBusinessId, p_photo_path: photoPath });
+                        attendanceForm.reset();
+                        checkInPreview.textContent = "";
+                        attendance = await loadAttendanceFromSupabase();
+                        renderAttendance();
+                    } catch (error) {
+                        attendanceError.textContent = `Check-in gagal: ${error.message}`;
+                    }
+                    return;
+                }
+                const checkInPhoto = saveAttendancePhoto(photoData);
+                const record = { id: createId("attendance"), businessId: currentBusinessId, userId: attendanceUserId, date: now, checkIn: now, checkInPhoto, checkOut: null, checkOutPhoto: null, status: "Hadir", createdAt: now, updatedAt: now };
+                attendance.push(record);
+                saveWorkspaceData();
+                recordAudit("attendance_check_in", "attendance", record.id, null, record);
+                attendanceForm.reset();
+                checkInPreview.textContent = "";
+                renderAttendance();
+            });
+
+            attendanceCheckoutPhoto.addEventListener("change", async () => {
+                renderPhotoPreview(attendanceCheckoutPhoto, checkOutPreview);
+                const record = attendance.find((item) => item.id === pendingCheckoutAttendanceId);
+                if (!record || !attendanceCheckoutPhoto.files[0]) {
+                    return;
+                }
+                const photoData = await readPhotoFile(attendanceCheckoutPhoto.files[0]);
+                if (!photoData || !window.confirm("Simpan check-out dengan foto ini?")) {
+                    pendingCheckoutAttendanceId = null;
+                    return;
+                }
+                if (supabaseClient) {
+                    try {
+                        const photoPath = await uploadSupabaseAttendancePhoto(photoData, "check-out");
+                        await supabaseClient.rpc("check_out", { p_attendance_id: record.id, p_photo_path: photoPath });
+                        attendance = await loadAttendanceFromSupabase();
+                        renderAttendance();
+                    } catch (error) {
+                        attendanceError.textContent = `Check-out gagal: ${error.message}`;
+                    }
+                    pendingCheckoutAttendanceId = null;
+                    return;
+                }
+                record.checkOut = new Date().toISOString();
+                record.checkOutPhoto = saveAttendancePhoto(photoData);
+                record.updatedAt = record.checkOut;
+                saveWorkspaceData();
+                recordAudit("attendance_check_out", "attendance", record.id, null, record);
+                pendingCheckoutAttendanceId = null;
+                checkOutPreview.textContent = "";
+                renderAttendance();
+            });
+
+            attendancePhoto.addEventListener("change", () => renderPhotoPreview(attendancePhoto, checkInPreview));
+            [attendanceFilterStaff, attendanceFilterPeriod, attendanceFilterFrom, attendanceFilterTo, attendanceFilterStatus].forEach((input) => input.addEventListener("change", () => {
+                const custom = attendanceFilterPeriod.value === "custom";
+                attendanceFilterFrom.hidden = !custom;
+                attendanceFilterTo.hidden = !custom;
+                renderAttendance();
+            }));
+
+            document.getElementById("export-transactions-button").addEventListener("click", exportTransactionsCsv);
+            document.getElementById("export-excel-button").addEventListener("click", exportTransactionsExcel);
+            document.getElementById("export-pdf-button").addEventListener("click", exportTransactionsPdf);
+            document.getElementById("backup-button").addEventListener("click", createBackup);
+            document.getElementById("restore-button").addEventListener("click", () => document.getElementById("restore-input").click());
+            document.getElementById("restore-input").addEventListener("change", async (event) => {
+                if (!isOwner()) {
+                    window.alert("Hanya Owner yang dapat melakukan restore.");
+                    return;
+                }
+                const file = event.target.files[0];
+                if (!file || !window.confirm("Restore akan mengganti data transaksi, staff, dan absensi bisnis aktif. Lanjutkan?")) {
+                    return;
+                }
+                try {
+                    const backup = JSON.parse(await file.text());
+                    if (!Array.isArray(backup.transactions) || !Array.isArray(backup.staff) || !Array.isArray(backup.attendance)) {
+                        throw new Error("Struktur backup tidak valid.");
+                    }
+                    transactions = backup.transactions;
+                    staff = backup.staff;
+                    attendance = backup.attendance;
+                    saveTransactions();
+                    saveWorkspaceData();
+                    window.location.reload();
+                } catch (error) {
+                    window.alert("Backup tidak dapat dipulihkan karena formatnya tidak valid.");
+                }
+            });
+        function updateFinancialReport() {
+            const reportTransactions = getTransactionsForPeriod(summaryPeriod.value);
+            const totals = calculateTotals(reportTransactions);
+            const hasTransactions = reportTransactions.length > 0;
+
+            reportGrid.hidden = !hasTransactions;
+            reportEmpty.hidden = hasTransactions;
+            if (!hasTransactions) {
+                return;
+            }
+
+            reportIncome.textContent = formatRupiah(totals.income);
+            reportExpense.textContent = formatRupiah(totals.expense);
+            updateResultDisplay(reportResultLabel, reportResult, totals.result);
+            reportCount.textContent = reportTransactions.length;
+            reportLargestIncome.textContent = formatRupiah(Math.max(
+                0,
+                ...reportTransactions
+                    .filter((transaction) => transaction.type === "income")
+                    .map((transaction) => transaction.amount)
+            ));
+            reportLargestExpense.textContent = formatRupiah(Math.max(
+                0,
+                ...reportTransactions
+                    .filter((transaction) => transaction.type === "expense")
+                    .map((transaction) => transaction.amount)
+            ));
+        }
+
+        function prepareCanvas(canvas) {
+            const width = canvas.clientWidth || 440;
+            const height = 260;
+            const pixelRatio = window.devicePixelRatio || 1;
+            canvas.width = width * pixelRatio;
+            canvas.height = height * pixelRatio;
+            const context = canvas.getContext("2d");
+            context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+            context.clearRect(0, 0, width, height);
+            context.font = "12px Trebuchet MS, Arial, sans-serif";
+            return { context, width, height };
+        }
+
+        function drawComparisonChart() {
+            const chartTransactions = getTransactionsForPeriod(summaryPeriod.value);
+            const hasTransactions = chartTransactions.length > 0;
+            comparisonChart.hidden = !hasTransactions;
+            comparisonEmpty.hidden = hasTransactions;
+            if (!hasTransactions) {
+                return;
+            }
+
+            const totals = calculateTotals(chartTransactions);
+            const { context, width, height } = prepareCanvas(comparisonChart);
+            const chartBottom = height - 38;
+            const chartTop = 24;
+            const chartHeight = chartBottom - chartTop;
+            const chartLeft = 44;
+            const chartWidth = width - chartLeft - 20;
+            const maximum = Math.max(totals.income, totals.expense, 1);
+            const barWidth = Math.min(70, chartWidth / 5);
+            const gap = 24;
+            const groupWidth = barWidth * 2 + gap;
+            const groupLeft = chartLeft + (chartWidth - groupWidth) / 2;
+
+            context.strokeStyle = "#cbd5e1";
+            context.beginPath();
+            context.moveTo(chartLeft, chartTop);
+            context.lineTo(chartLeft, chartBottom);
+            context.lineTo(width - 20, chartBottom);
+            context.stroke();
+
+            const bars = [
+                { value: totals.income, color: "#16a34a", label: "Pemasukan", x: groupLeft },
+                { value: totals.expense, color: "#dc2626", label: "Pengeluaran", x: groupLeft + barWidth + gap }
+            ];
+            bars.forEach((bar) => {
+                const barHeight = (bar.value / maximum) * chartHeight;
+                context.fillStyle = bar.color;
+                context.fillRect(bar.x, chartBottom - barHeight, barWidth, barHeight);
+                context.fillStyle = "#475569";
+                context.textAlign = "center";
+                context.fillText(bar.label, bar.x + barWidth / 2, height - 14);
+                context.fillText(formatRupiah(bar.value), bar.x + barWidth / 2, Math.max(chartTop + 12, chartBottom - barHeight - 7));
+            });
+        }
+
+        function getTrendKey(date, period) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, "0");
+            if (period === "current-year" || period === "three-months" || period === "all") {
+                return `${year}-${month}`;
+            }
+
+            return `${year}-${month}-${String(date.getDate()).padStart(2, "0")}`;
+        }
+
+        function drawTrendLine(context, points, color) {
+            if (points.length === 0) {
+                return;
+            }
+
+            context.strokeStyle = color;
+            context.lineWidth = 2;
+            context.beginPath();
+            points.forEach((point, index) => {
+                if (index === 0) {
+                    context.moveTo(point.x, point.y);
+                } else {
+                    context.lineTo(point.x, point.y);
+                }
+            });
+            context.stroke();
+            context.fillStyle = color;
+            points.forEach((point) => context.fillRect(point.x - 3, point.y - 3, 6, 6));
+        }
+
+        function drawTrendChart() {
+            const chartTransactions = getTransactionsForPeriod(summaryPeriod.value);
+            const hasTransactions = chartTransactions.length > 0;
+            trendChart.hidden = !hasTransactions;
+            trendEmpty.hidden = hasTransactions;
+            if (!hasTransactions) {
+                return;
+            }
+
+            const grouped = new Map();
+            chartTransactions.forEach((transaction) => {
+                const date = new Date(transaction.date);
+                if (Number.isNaN(date.getTime())) {
+                    return;
+                }
+                const key = getTrendKey(date, summaryPeriod.value);
+                if (!grouped.has(key)) {
+                    grouped.set(key, { income: 0, expense: 0 });
+                }
+                grouped.get(key)[transaction.type] += transaction.amount;
+            });
+
+            const entries = Array.from(grouped.entries()).sort(([first], [second]) => first.localeCompare(second));
+            if (entries.length === 0) {
+                trendChart.hidden = true;
+                trendEmpty.hidden = false;
+                return;
+            }
+
+            const { context, width, height } = prepareCanvas(trendChart);
+            const chartLeft = 42;
+            const chartRight = width - 16;
+            const chartTop = 22;
+            const chartBottom = height - 42;
+            const chartHeight = chartBottom - chartTop;
+            const maximum = Math.max(1, ...entries.flatMap(([, values]) => [values.income, values.expense]));
+            const xStep = entries.length === 1 ? 0 : (chartRight - chartLeft) / (entries.length - 1);
+
+            context.strokeStyle = "#cbd5e1";
+            context.beginPath();
+            context.moveTo(chartLeft, chartTop);
+            context.lineTo(chartLeft, chartBottom);
+            context.lineTo(chartRight, chartBottom);
+            context.stroke();
+
+            const incomePoints = [];
+            const expensePoints = [];
+            entries.forEach(([label, values], index) => {
+                const x = entries.length === 1 ? (chartLeft + chartRight) / 2 : chartLeft + index * xStep;
+                incomePoints.push({ x, y: chartBottom - (values.income / maximum) * chartHeight });
+                expensePoints.push({ x, y: chartBottom - (values.expense / maximum) * chartHeight });
+                if (entries.length <= 8 || index % Math.ceil(entries.length / 8) === 0) {
+                    context.fillStyle = "#475569";
+                    context.textAlign = "center";
+                    context.fillText(label.slice(5), x, height - 16);
+                }
+            });
+
+            drawTrendLine(context, incomePoints, "#16a34a");
+            drawTrendLine(context, expensePoints, "#dc2626");
+            context.textAlign = "left";
+            context.fillStyle = "#16a34a";
+            context.fillText("Pemasukan", chartLeft, 12);
+            context.fillStyle = "#dc2626";
+            context.fillText("Pengeluaran", chartLeft + 86, 12);
+        }
+
+        function renderReportsAndCharts() {
+            updateFinancialSummary();
+            updateFinancialReport();
+            drawComparisonChart();
+            drawTrendChart();
         }
 
         function renderTransactions() {
             transactionList.textContent = "";
 
-            if (transactions.length === 0) {
+            const visibleTransactions = transactions.filter((transaction) => canViewTransaction(transaction));
+            if (visibleTransactions.length === 0) {
                 const emptyState = document.createElement("p");
                 emptyState.className = "empty-state";
                 emptyState.textContent = "Belum ada transaksi.";
@@ -385,7 +3000,16 @@
                 return;
             }
 
-            transactions.forEach((transaction) => {
+            const filteredTransactions = getFilteredTransactions();
+            if (filteredTransactions.length === 0) {
+                const emptyState = document.createElement("p");
+                emptyState.className = "empty-state";
+                emptyState.textContent = "Tidak ada transaksi yang sesuai.";
+                transactionList.appendChild(emptyState);
+                return;
+            }
+
+            filteredTransactions.forEach((transaction) => {
                 const item = document.createElement("article");
                 item.className = "transaction-item";
 
@@ -396,18 +3020,59 @@
                 const type = document.createElement("p");
                 type.className = "transaction-type";
                 type.textContent = transaction.type === "income" ? "Pemasukan" : "Pengeluaran";
-                details.append(description, type);
+                const date = document.createElement("p");
+                date.className = "transaction-date";
+                date.textContent = formatDate(transaction.date);
+                details.append(description, type, date);
 
                 const value = document.createElement("p");
                 value.className = "transaction-value " + transaction.type;
                 value.textContent = (transaction.type === "income" ? "+ " : "- ") + formatRupiah(transaction.amount);
 
-                item.append(details, value);
+                const actions = document.createElement("div");
+                actions.className = "transaction-actions";
+                const editButton = document.createElement("button");
+                editButton.className = "edit-button";
+                editButton.type = "button";
+                editButton.textContent = isOwner() ? "Edit" : "Ajukan Edit";
+                editButton.addEventListener("click", () => openEditModal(transaction.id));
+                const deleteButton = document.createElement("button");
+                deleteButton.className = "delete-button";
+                deleteButton.type = "button";
+                deleteButton.textContent = "Hapus";
+                deleteButton.hidden = !isOwner();
+                deleteButton.addEventListener("click", () => deleteTransaction(transaction.id));
+                actions.append(editButton, deleteButton);
+
+                item.append(details, value, actions);
                 transactionList.appendChild(item);
             });
         }
 
-        function openModal() {
+        function openAddModal() {
+            editingTransactionId = null;
+            formTitle.textContent = "Tambah Transaksi";
+            transactionForm.reset();
+            descriptionError.textContent = "";
+            amountError.textContent = "";
+            transactionModal.classList.add("is-open");
+            transactionModal.setAttribute("aria-hidden", "false");
+            descriptionInput.focus();
+        }
+
+        function openEditModal(transactionId) {
+            const transaction = transactions.find((item) => item.id === transactionId);
+            if (!transaction || !canViewTransaction(transaction)) {
+                return;
+            }
+
+            editingTransactionId = transactionId;
+            formTitle.textContent = "Edit Transaksi";
+            transactionTypeInput.value = transaction.type;
+            descriptionInput.value = transaction.description;
+            amountInput.value = formatAmountInput(transaction.amount);
+            descriptionError.textContent = "";
+            amountError.textContent = "";
             transactionModal.classList.add("is-open");
             transactionModal.setAttribute("aria-hidden", "false");
             descriptionInput.focus();
@@ -417,13 +3082,34 @@
             transactionModal.classList.remove("is-open");
             transactionModal.setAttribute("aria-hidden", "true");
             transactionForm.reset();
+            editingTransactionId = null;
+            formTitle.textContent = "Tambah Transaksi";
             descriptionError.textContent = "";
             amountError.textContent = "";
         }
 
+        function deleteTransaction(transactionId) {
+            const transaction = transactions.find((item) => item.id === transactionId);
+            if (!transaction || !canDeleteTransaction(transaction)) {
+                window.alert("Anda tidak memiliki izin menghapus transaksi ini.");
+                return;
+            }
+            if (!window.confirm("Apakah Anda yakin ingin menghapus transaksi ini?")) {
+                return;
+            }
+
+            transactions = transactions.filter((transaction) => transaction.id !== transactionId);
+            saveTransactions();
+            void deleteTransactionFromSupabase(transactionId);
+            recordAudit("transaction_deleted", "transaction", transactionId, transaction, null);
+            updateDashboard();
+            renderReportsAndCharts();
+            renderTransactions();
+        }
+
         function validateForm() {
             const description = descriptionInput.value.trim();
-            const amount = Number(amountInput.value);
+            const amount = getAmountFromInput();
             let isValid = true;
 
             descriptionError.textContent = "";
@@ -434,7 +3120,7 @@
                 isValid = false;
             }
 
-            if (!amountInput.value || !Number.isFinite(amount) || amount <= 0) {
+            if (!amountInput.value || !Number.isSafeInteger(amount) || amount <= 0) {
                 amountError.textContent = "Nominal harus lebih dari 0.";
                 isValid = false;
             }
@@ -442,8 +3128,13 @@
             return isValid;
         }
 
-        document.getElementById("open-modal-button").addEventListener("click", openModal);
+        document.getElementById("open-modal-button").addEventListener("click", openAddModal);
         document.getElementById("cancel-button").addEventListener("click", closeModal);
+        amountInput.addEventListener("input", formatAmountInputValue);
+        searchInput.addEventListener("input", renderTransactions);
+        typeFilter.addEventListener("change", renderTransactions);
+        periodFilter.addEventListener("change", renderTransactions);
+        summaryPeriod.addEventListener("change", renderReportsAndCharts);
 
         transactionModal.addEventListener("click", (event) => {
             if (event.target === transactionModal) {
@@ -457,19 +3148,60 @@
                 return;
             }
 
-            transactions.unshift({
-                type: document.getElementById("transaction-type").value,
+            const transactionData = {
+                businessId: currentBusinessId,
+                createdBy: editingTransactionId
+                    ? transactions.find((transaction) => transaction.id === editingTransactionId).createdBy
+                    : currentUser.id,
+                date: editingTransactionId
+                    ? transactions.find((transaction) => transaction.id === editingTransactionId).date
+                    : new Date().toISOString(),
+                type: transactionTypeInput.value,
                 description: descriptionInput.value.trim(),
-                amount: Number(amountInput.value)
-            });
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+                amount: getAmountFromInput()
+            };
+
+            if (editingTransactionId && !isOwner()) {
+                const transaction = transactions.find((item) => item.id === editingTransactionId);
+                if (transaction) {
+                    createEditRequest(transaction, transactionData);
+                }
+                closeModal();
+                return;
+            }
+
+            if (editingTransactionId) {
+                const transactionIndex = transactions.findIndex((transaction) => transaction.id === editingTransactionId);
+                if (transactionIndex !== -1 && canEditTransaction(transactions[transactionIndex])) {
+                    const oldTransaction = { ...transactions[transactionIndex] };
+                    transactions[transactionIndex] = {
+                        id: transactions[transactionIndex].id,
+                        ...transactionData
+                    };
+                    recordAudit("transaction_edited", "transaction", editingTransactionId, oldTransaction, transactions[transactionIndex]);
+                }
+            } else {
+                transactions.unshift({
+                    id: createTransactionId(),
+                    ...transactionData
+                });
+                recordAudit("transaction_created", "transaction", transactions[0].id, null, transactions[0]);
+            }
+
+            saveTransactions();
             updateDashboard();
+            renderReportsAndCharts();
             renderTransactions();
             closeModal();
         });
 
         updateDashboard();
+        renderReportsAndCharts();
         renderTransactions();
+        showAuthenticatedApp();
+        if (supabaseClient) {
+            initializeSupabaseAuth();
+        }
     </script>
 
 </body>
